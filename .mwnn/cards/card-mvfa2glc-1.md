@@ -100,5 +100,5 @@ No unresolved exceptions. Follow-ups that are not criteria:
 - The repository changes still need committing and pushing.
 - The card's column is left to the board's rules. `card-mvfa2glc-5` can now use the benefit id and the P6 URL.
 
-Follow-up on 2026-10-19 (user-reported): Darren deleted the private test checkout link and asked for the changes to be committed and pushed to `main`. He has not said whether the 100% discount was deleted; its one redemption is already used.
+Follow-up on 2026-10-19 (user-reported): Darren deleted the private test checkout link and asked for the changes to be committed and pushed to `main`. At the time he had not said whether the 100% discount was deleted; its one redemption was already used. Later the same day (user-reported, interview chat, 2026-10-19), Darren said he had deleted the 100% discount code. Polar clean-up is complete.
 STATUS: DONE
