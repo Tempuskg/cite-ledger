@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and how-to
+    url: https://github.com/Tempuskg/cite-ledger/discussions
+    about: Ask how to use Cite Ledger in GitHub Discussions.
+  - name: What Cite Ledger cannot check
+    url: https://github.com/Tempuskg/cite-ledger/blob/main/docs/limits.md
+    about: The limits L1-L3, and exactly what leaves your machine.

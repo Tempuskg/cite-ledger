@@ -1,0 +1,33 @@
+# Weekly check that the claim fixtures still hold against the real Crossref API.
+# A failure means P1-P5 may not be used in marketing until it passes again
+# (standing instruction, stop condition 2). Read-only; GitHub-hosted runners are free
+# for public repositories, so this adds no cost.
+name: Crossref live
+
+on:
+  schedule:
+    - cron: '17 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Claim fixtures against live Crossref
+        run: npm run test:live

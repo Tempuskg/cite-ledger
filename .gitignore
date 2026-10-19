@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-test/
+*.vsix
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+.chat/

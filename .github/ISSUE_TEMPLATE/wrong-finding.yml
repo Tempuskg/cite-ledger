@@ -1,0 +1,35 @@
+name: Wrong finding
+description: Cite Ledger reported something about a reference that you believe is not true.
+title: "Wrong finding: "
+labels: ["wrong-finding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. A wrong finding is treated as a defect. Please do not include personal data, licence keys or unpublished work.
+  - type: input
+    id: reference
+    attributes:
+      label: Reference
+      description: The DOI, or the reference text as it appears in your file.
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: Finding
+      description: The finding as Cite Ledger showed it, including its claim ID (P1–P4).
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why you believe it is wrong
+      description: For example a link to the publisher's page or another record.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Cite Ledger version and editor
+      placeholder: "0.1.0, VS Code 1.95"

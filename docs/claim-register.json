@@ -1,0 +1,116 @@
+{
+  "about": "The only product claims Cite Ledger's README, product page, listings and marketing may make. P1-P6 and L1-L3 are the accepted register (accepted 2026-10-19). Proposed claims may not appear on any public surface until accepted. scripts/check-claims.mjs enforces this and checks that each claim's tests exist; npm test must pass in the same run.",
+  "claims": [
+    {
+      "id": "P1",
+      "status": "accepted",
+      "text": "Flags references whose DOI does not resolve in Crossref.",
+      "evidence": "Unregistered-DOI fixture",
+      "tests": ["P1: flags a reference whose DOI does not resolve in Crossref (unregistered-DOI fixture)"]
+    },
+    {
+      "id": "P2",
+      "status": "accepted",
+      "text": "Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data.",
+      "evidence": "Known retracted DOI fixture; Crossref blog, 2025-01-29: https://www.crossref.org/blog/retraction-watch-retractions-now-in-the-crossref-api/",
+      "tests": [
+        "P2: flags a retraction and a correction recorded by Retraction Watch (known retracted DOI fixture)",
+        "P2: flags an expression of concern recorded in Crossref"
+      ]
+    },
+    {
+      "id": "P3",
+      "status": "accepted",
+      "text": "Shows where an entry's title, year or first author differs from the Crossref record.",
+      "evidence": "Mismatch fixture",
+      "tests": ["P3: shows where the title, year and first author differ from the Crossref record (mismatch fixture)"]
+    },
+    {
+      "id": "P4",
+      "status": "accepted",
+      "text": "Marks references with no matching Crossref record as unverified.",
+      "proText": "Marks references with no matching Crossref record as unverified and shows the closest match.",
+      "evidence": "Free and Pro fixture tests",
+      "tests": [
+        "P4: marks a reference with no matching Crossref record as unverified (free, no closest match)",
+        "P4 Pro: shows the closest match for an unverified reference",
+        "P4: a reference without a DOI that search confirms is not marked unverified"
+      ]
+    },
+    {
+      "id": "P5",
+      "status": "accepted",
+      "text": "Runs on your machine and sends only the reference details it looks up to Crossref.",
+      "evidence": "Network test: only api.crossref.org is called during a check",
+      "tests": [
+        "P5: checking every fixture file calls only api.crossref.org and sends no prose",
+        "P5: a free CLI run calls only api.crossref.org and never contacts the licence server"
+      ]
+    },
+    {
+      "id": "P6",
+      "status": "accepted",
+      "text": "Single-file checks are free; Pro is a one-time licence.",
+      "evidence": "Live Polar product page at the price Darren set. The price is quoted from that page, never typed from memory.",
+      "requiresLiveProduct": true,
+      "productUrl": null,
+      "tests": ["single-file checks, including retraction flags, are free and exit 0"]
+    },
+    {
+      "id": "L1",
+      "status": "accepted",
+      "text": "Does not check DOIs registered outside Crossref, for example DataCite.",
+      "evidence": "docs/limits.md#l1",
+      "tests": []
+    },
+    {
+      "id": "L2",
+      "status": "accepted",
+      "text": "Crossref's retraction data can miss some retractions.",
+      "evidence": "docs/limits.md#l2",
+      "tests": []
+    },
+    {
+      "id": "L3",
+      "status": "accepted",
+      "text": "'Unverified' means no matching record was found, not that the reference is fabricated.",
+      "evidence": "docs/limits.md#l3",
+      "tests": []
+    },
+    {
+      "id": "P7",
+      "status": "proposed",
+      "text": "Reads .bib files, LaTeX thebibliography lists and Markdown reference sections.",
+      "evidence": "Parser fixture tests",
+      "tests": [
+        "reads entries, fields, DOIs and lines from the fixture",
+        "reads thebibliography items, \\doi and ignores comments",
+        "reads the References section, inline DOIs in prose, and skips code fences"
+      ]
+    },
+    {
+      "id": "P8",
+      "status": "proposed",
+      "text": "Pro adds workspace-wide scans, CLI/CI exit codes, Markdown, CSV and JSON reports, and closest-match suggestions.",
+      "evidence": "Pro gating tests",
+      "tests": [
+        "unlocks workspace scan, exit codes, export and closest match",
+        "Markdown, CSV and JSON reports carry evidence links and limits L1-L3"
+      ]
+    },
+    {
+      "id": "P9",
+      "status": "proposed",
+      "text": "Makes no AI model calls: every check is a lookup in Crossref's records.",
+      "evidence": "Network test: only api.crossref.org is called during a check",
+      "tests": ["P5: checking every fixture file calls only api.crossref.org and sends no prose"]
+    },
+    {
+      "id": "P10",
+      "status": "proposed",
+      "text": "A Pro licence check sends your licence key, and no reference data, to Polar, the payment provider.",
+      "evidence": "Licence request test",
+      "tests": ["licence validation sends only the key and public identifiers, with no secret"]
+    }
+  ]
+}

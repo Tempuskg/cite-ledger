@@ -1,0 +1,124 @@
+{
+  "status": "ok",
+  "message-type": "work-list",
+  "message": {
+    "items": [
+      {
+        "DOI": "10.2139/ssrn.4350425",
+        "title": [
+          "Subnucleonic Quantum Spaces and Entanglement Contributions to Force Fields and Quantum Gravity"
+        ],
+        "author": [
+          {
+            "given": "Suresh",
+            "family": "Kumar.S",
+            "sequence": "first"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2023
+            ]
+          ]
+        },
+        "published": {
+          "date-parts": [
+            [
+              2023
+            ]
+          ]
+        },
+        "type": "posted-content",
+        "URL": "https://doi.org/10.2139/ssrn.4350425"
+      },
+      {
+        "DOI": "10.2172/2282457",
+        "title": [
+          "GQuEST: Gravity from the Quantum Entanglement of Space Time"
+        ],
+        "author": [
+          {
+            "given": "Chris",
+            "family": "Stoughton",
+            "sequence": "first"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2024,
+              1,
+              17
+            ]
+          ]
+        },
+        "published": {
+          "date-parts": [
+            [
+              2024,
+              1,
+              17
+            ]
+          ]
+        },
+        "type": "proceedings-article",
+        "container-title": [
+          "GQuEST: Gravity from the Quantum Entanglement of Space Time"
+        ],
+        "URL": "https://doi.org/10.2172/2282457"
+      },
+      {
+        "DOI": "10.1088/1361-6382/acb0aa",
+        "title": [
+          "Gravity entanglement, quantum reference systems, degrees of freedom"
+        ],
+        "author": [
+          {
+            "given": "Marios",
+            "family": "Christodoulou",
+            "sequence": "first"
+          },
+          {
+            "given": "Andrea",
+            "family": "Di Biagio",
+            "sequence": "additional"
+          },
+          {
+            "given": "Richard",
+            "family": "Howl",
+            "sequence": "additional"
+          },
+          {
+            "given": "Carlo",
+            "family": "Rovelli",
+            "sequence": "additional"
+          }
+        ],
+        "issued": {
+          "date-parts": [
+            [
+              2023,
+              1,
+              25
+            ]
+          ]
+        },
+        "published": {
+          "date-parts": [
+            [
+              2023,
+              1,
+              25
+            ]
+          ]
+        },
+        "type": "journal-article",
+        "container-title": [
+          "Classical and Quantum Gravity"
+        ],
+        "URL": "https://doi.org/10.1088/1361-6382/acb0aa"
+      }
+    ]
+  }
+}

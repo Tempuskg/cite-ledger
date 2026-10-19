@@ -1,0 +1,117 @@
+{
+  "status": "ok",
+  "message-type": "work",
+  "message": {
+    "DOI": "10.1371/journal.pone.0061107",
+    "title": [
+      "Impairment of FOS mRNA Stabilization Following Translation Arrest in Granulocytes from Myelodysplastic Syndrome Patients"
+    ],
+    "author": [
+      {
+        "given": "Xiaomin",
+        "family": "Feng",
+        "sequence": "first"
+      },
+      {
+        "given": "Yayoi",
+        "family": "Shikama",
+        "sequence": "additional"
+      },
+      {
+        "given": "Tsutomu",
+        "family": "Shichishima",
+        "sequence": "additional"
+      },
+      {
+        "given": "Hideyoshi",
+        "family": "Noji",
+        "sequence": "additional"
+      },
+      {
+        "given": "Kazuhiko",
+        "family": "Ikeda",
+        "sequence": "additional"
+      },
+      {
+        "given": "Kazuei",
+        "family": "Ogawa",
+        "sequence": "additional"
+      },
+      {
+        "given": "Hideo",
+        "family": "Kimura",
+        "sequence": "additional"
+      },
+      {
+        "given": "Yasuchika",
+        "family": "Takeishi",
+        "sequence": "additional"
+      },
+      {
+        "given": "Junko",
+        "family": "Kimura",
+        "sequence": "additional"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2013,
+          4,
+          12
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2013,
+          4,
+          12
+        ]
+      ]
+    },
+    "updated-by": [
+      {
+        "DOI": "10.1371/journal.pone.0278805",
+        "type": "expression_of_concern",
+        "label": "Expression of concern",
+        "source": "retraction-watch",
+        "updated": {
+          "date-parts": [
+            [
+              2023,
+              1,
+              11
+            ]
+          ],
+          "date-time": "2023-01-11T00:00:00Z",
+          "timestamp": 1673395200000
+        },
+        "record-id": "44276"
+      },
+      {
+        "DOI": "10.1371/journal.pone.0278805",
+        "type": "expression_of_concern",
+        "label": "Expression of concern",
+        "source": "publisher",
+        "updated": {
+          "date-parts": [
+            [
+              2023,
+              1,
+              11
+            ]
+          ],
+          "date-time": "2023-01-11T00:00:00Z",
+          "timestamp": 1673395200000
+        }
+      }
+    ],
+    "type": "journal-article",
+    "container-title": [
+      "PLoS ONE"
+    ],
+    "URL": "https://doi.org/10.1371/journal.pone.0061107"
+  }
+}

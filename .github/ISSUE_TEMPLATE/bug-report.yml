@@ -1,0 +1,24 @@
+name: Bug report
+description: Something in Cite Ledger does not work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not include personal data, licence keys or unpublished work. For licence or payment questions, use the contact on the receipt from Polar instead of an issue.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: A minimal reference entry that shows the problem helps most.
+  - type: input
+    id: version
+    attributes:
+      label: Cite Ledger version and editor
+      placeholder: "0.1.0, VS Code 1.95"

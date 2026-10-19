@@ -1,0 +1,132 @@
+{
+  "name": "cite-ledger",
+  "displayName": "Cite Ledger — Citation & Retraction Checker",
+  "description": "Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data.",
+  "version": "0.1.0",
+  "publisher": "darrenjmcleod",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "homepage": "https://github.com/Tempuskg/cite-ledger#readme",
+  "bugs": {
+    "url": "https://github.com/Tempuskg/cite-ledger/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tempuskg/cite-ledger.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "bibtex",
+    "latex",
+    "citations",
+    "references",
+    "crossref",
+    "doi",
+    "retraction"
+  ],
+  "main": "./dist/extension.js",
+  "bin": {
+    "cite-ledger": "dist/cli.js"
+  },
+  "activationEvents": [
+    "onLanguage:bibtex",
+    "onLanguage:latex",
+    "onLanguage:markdown"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "citeLedger.checkFile",
+        "title": "Check References in This File",
+        "category": "Cite Ledger",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "citeLedger.scanWorkspace",
+        "title": "Check All Reference Files in Workspace (Pro)",
+        "category": "Cite Ledger"
+      },
+      {
+        "command": "citeLedger.exportReport",
+        "title": "Export Report (Pro)",
+        "category": "Cite Ledger"
+      },
+      {
+        "command": "citeLedger.enterLicenseKey",
+        "title": "Enter Pro Licence Key",
+        "category": "Cite Ledger"
+      },
+      {
+        "command": "citeLedger.clearLicenseKey",
+        "title": "Remove Pro Licence Key",
+        "category": "Cite Ledger"
+      },
+      {
+        "command": "citeLedger.showLimits",
+        "title": "Show What Cite Ledger Cannot Check",
+        "category": "Cite Ledger"
+      },
+      {
+        "command": "citeLedger.clearFindings",
+        "title": "Clear Findings",
+        "category": "Cite Ledger"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "citeLedger.checkFile",
+          "when": "resourceExtname =~ /^\\.(bib|tex|ltx|md|markdown|qmd|rmd)$/i",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Cite Ledger",
+      "properties": {
+        "citeLedger.mailto": {
+          "type": "string",
+          "default": "",
+          "description": "Your email address for Crossref's polite pool. When set, it is sent to api.crossref.org with each lookup, as Crossref asks. It is never put in reports or evidence links.",
+          "scope": "application"
+        },
+        "citeLedger.checkOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Check a .bib, .tex or Markdown file each time it is saved. Each check sends that file's reference details to api.crossref.org.",
+          "scope": "resource"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "package": "node esbuild.mjs --production",
+    "vscode:prepublish": "npm run package",
+    "vsix": "vsce package",
+    "lint": "eslint . && tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "tsc -p tsconfig.test.json && node --test \"dist-test/test/**/*.test.js\"",
+    "test:live": "tsc -p tsconfig.test.json && node --test \"dist-test/test-live/**/*.test.js\"",
+    "check:claims": "node scripts/check-claims.mjs",
+    "check": "npm run lint && npm test && npm run check:claims && npm run vsix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "@types/node": "^22.15.3",
+    "@types/vscode": "~1.85.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.25.3",
+    "eslint": "^9.25.1",
+    "globals": "^16.0.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.30.1"
+  }
+}
