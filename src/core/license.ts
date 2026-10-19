@@ -5,8 +5,8 @@ const POLAR_VALIDATE_URL = `https://${POLAR_API_HOST}/v1/customer-portal/license
 
 /** Public identifiers, not secrets: the company's Polar organization and Cite Ledger's licence-key benefit. */
 export const POLAR_ORGANIZATION_ID = '9a3f3f03-1384-425b-8a7a-54866b7d634a';
-/** Empty until Darren creates the Polar product; Pro then stays locked (fail closed). */
-export const POLAR_BENEFIT_ID = '';
+/** The License Keys benefit on the "Cite Ledger Pro" Polar product. Empty would keep Pro locked (fail closed). */
+export const POLAR_BENEFIT_ID = '6474b7e4-7fae-4610-92f6-08d1ba2a4398';
 
 export type LicenseResult =
   | { readonly valid: true }

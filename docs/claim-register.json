@@ -57,7 +57,7 @@
       "text": "Single-file checks are free; Pro is a one-time licence.",
       "evidence": "Live Polar product page at the price Darren set. The price is quoted from that page, never typed from memory.",
       "requiresLiveProduct": true,
-      "productUrl": null,
+      "productUrl": "https://buy.polar.sh/polar_cl_sTahdpEXRlwOfOi2HwXgYerl2LRAoQTpoGNr909TkK1",
       "tests": [
         "single-file checks, including retraction flags, are free and exit 0"
       ],
