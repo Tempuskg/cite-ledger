@@ -6,13 +6,19 @@ Cite Ledger is an extension for VS Code-compatible editors, with a command-line 
 
 ## What it checks
 
+- Reads .bib files, LaTeX thebibliography lists and Markdown reference sections. <sup>[P7](docs/claim-register.md#p7)</sup>
 - Flags references whose DOI does not resolve in Crossref. <sup>[P1](docs/claim-register.md#p1)</sup>
 - Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data. <sup>[P2](docs/claim-register.md#p2)</sup>
 - Shows where an entry's title, year or first author differs from the Crossref record. <sup>[P3](docs/claim-register.md#p3)</sup>
 - Marks references with no matching Crossref record as unverified. <sup>[P4](docs/claim-register.md#p4)</sup>
-- Runs on your machine and sends only the reference details it looks up to Crossref. <sup>[P5](docs/claim-register.md#p5)</sup>
 
 Every finding links to its evidence, such as the Crossref record or the retraction notice, and says how it could be wrong.
+
+## What leaves your machine
+
+- Runs on your machine and sends only the reference details it looks up to Crossref. <sup>[P5](docs/claim-register.md#p5)</sup>
+- Makes no AI model calls: every check is a lookup in Crossref's records. <sup>[P9](docs/claim-register.md#p9)</sup>
+- A Pro licence check sends your licence key, and no reference data, to Polar, the payment provider. <sup>[P10](docs/claim-register.md#p10)</sup>
 
 ## What it cannot check
 

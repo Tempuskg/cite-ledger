@@ -28,7 +28,12 @@ Before launch, Darren checks the product on a real reference file and reviews ev
 
 ## Acceptance criteria
 - [ ] Darren ran the extension on a real reference file, and his verdict is recorded in Activity, including any wrong finding, which becomes its own card.
-- [ ] Each of P7–P10 is recorded as accepted or rejected, and `docs/claim-register.json` matches.
+- [x] Each of P7–P10 is recorded as accepted or rejected, and `docs/claim-register.json` matches.
 - [ ] The listing text is approved, or the changes he asked for are made, and `npm run check` passes.
 
 ## Activity
+### 2026-10-19 - Claim review, part 2 (recorded by Claude Code)
+Q: "Which proposed public claims do you accept?"
+A: "P7 file types, P8 Pro features, P9 no AI calls, P10 licence check". Darren McLeod, 2026-10-19.
+
+All four are now marked accepted in `docs/claim-register.json` and `docs/claim-register.md`. The README now carries P7, P9 and P10. P8 waits for the release card, `card-mvfa2glc-5`, so that it appears together with P6 and the live price. The hands-on test and the listing-text approval are still open.

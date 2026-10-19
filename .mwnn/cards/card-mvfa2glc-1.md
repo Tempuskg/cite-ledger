@@ -9,10 +9,12 @@ updatedAt: 1792415841150
 ---
 
 ## Description
-Pro is unlocked by a Polar licence key, validated from the client with public identifiers only (`src/core/license.ts`). Until a benefit id is set there, Pro stays locked: it fails closed. Only Darren can do this, because it is an account and money action, and the price is his decision. USD $12 one-time was proposed.
+Pro is unlocked by a Polar licence key, validated from the client with public identifiers only (`src/core/license.ts`). Until a benefit id is set there, Pro stays locked: it fails closed. Only Darren can do this, because it is an account and money action.
+
+**Price decided: USD $12 one-time.** Darren chose "USD $12 one-time (Recommended)" on 2026-10-19, recorded on company card `card-mvf572fm-1`.
 
 Steps:
-1. In the existing Polar organization (`9a3f3f03-1384-425b-8a7a-54866b7d634a`, the one MWNN Kanban Pro uses), create a one-time product named "Cite Ledger Pro" at a price you choose.
+1. In the existing Polar organization (`9a3f3f03-1384-425b-8a7a-54866b7d634a`, the one MWNN Kanban Pro uses), create a one-time product named "Cite Ledger Pro" at USD $12.
 2. Give it a **License Keys** benefit. Leave any activation limit off, because the client validates keys and does not activate them.
 3. Give the agent two things: the **benefit id**, and the public **checkout or product page URL**.
 

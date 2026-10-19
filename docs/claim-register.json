@@ -1,12 +1,14 @@
 {
-  "about": "The only product claims Cite Ledger's README, product page, listings and marketing may make. P1-P6 and L1-L3 are the accepted register (accepted 2026-10-19). Proposed claims may not appear on any public surface until accepted. scripts/check-claims.mjs enforces this and checks that each claim's tests exist; npm test must pass in the same run.",
+  "about": "The only product claims Cite Ledger's README, product page, listings and marketing may make. P1-P6 and L1-L3 were accepted on 2026-10-19 with the marketing standing instruction; P7-P10 were accepted by Darren McLeod on 2026-10-19 after the build. A claim not marked accepted may not appear on any public surface. scripts/check-claims.mjs enforces this and checks that each claim's tests exist; npm test must pass in the same run.",
   "claims": [
     {
       "id": "P1",
       "status": "accepted",
       "text": "Flags references whose DOI does not resolve in Crossref.",
       "evidence": "Unregistered-DOI fixture",
-      "tests": ["P1: flags a reference whose DOI does not resolve in Crossref (unregistered-DOI fixture)"]
+      "tests": [
+        "P1: flags a reference whose DOI does not resolve in Crossref (unregistered-DOI fixture)"
+      ]
     },
     {
       "id": "P2",
@@ -23,7 +25,9 @@
       "status": "accepted",
       "text": "Shows where an entry's title, year or first author differs from the Crossref record.",
       "evidence": "Mismatch fixture",
-      "tests": ["P3: shows where the title, year and first author differ from the Crossref record (mismatch fixture)"]
+      "tests": [
+        "P3: shows where the title, year and first author differ from the Crossref record (mismatch fixture)"
+      ]
     },
     {
       "id": "P4",
@@ -54,7 +58,10 @@
       "evidence": "Live Polar product page at the price Darren set. The price is quoted from that page, never typed from memory.",
       "requiresLiveProduct": true,
       "productUrl": null,
-      "tests": ["single-file checks, including retraction flags, are free and exit 0"]
+      "tests": [
+        "single-file checks, including retraction flags, are free and exit 0"
+      ],
+      "price": "USD $12 one-time (decided by Darren McLeod 2026-10-19); quote it from the live Polar page, never from this field"
     },
     {
       "id": "L1",
@@ -79,38 +86,46 @@
     },
     {
       "id": "P7",
-      "status": "proposed",
+      "status": "accepted",
       "text": "Reads .bib files, LaTeX thebibliography lists and Markdown reference sections.",
       "evidence": "Parser fixture tests",
       "tests": [
         "reads entries, fields, DOIs and lines from the fixture",
         "reads thebibliography items, \\doi and ignores comments",
         "reads the References section, inline DOIs in prose, and skips code fences"
-      ]
+      ],
+      "acceptedOn": "2026-10-19"
     },
     {
       "id": "P8",
-      "status": "proposed",
+      "status": "accepted",
       "text": "Pro adds workspace-wide scans, CLI/CI exit codes, Markdown, CSV and JSON reports, and closest-match suggestions.",
       "evidence": "Pro gating tests",
       "tests": [
         "unlocks workspace scan, exit codes, export and closest match",
         "Markdown, CSV and JSON reports carry evidence links and limits L1-L3"
-      ]
+      ],
+      "acceptedOn": "2026-10-19"
     },
     {
       "id": "P9",
-      "status": "proposed",
+      "status": "accepted",
       "text": "Makes no AI model calls: every check is a lookup in Crossref's records.",
       "evidence": "Network test: only api.crossref.org is called during a check",
-      "tests": ["P5: checking every fixture file calls only api.crossref.org and sends no prose"]
+      "tests": [
+        "P5: checking every fixture file calls only api.crossref.org and sends no prose"
+      ],
+      "acceptedOn": "2026-10-19"
     },
     {
       "id": "P10",
-      "status": "proposed",
+      "status": "accepted",
       "text": "A Pro licence check sends your licence key, and no reference data, to Polar, the payment provider.",
       "evidence": "Licence request test",
-      "tests": ["licence validation sends only the key and public identifiers, with no secret"]
+      "tests": [
+        "licence validation sends only the key and public identifiers, with no secret"
+      ],
+      "acceptedOn": "2026-10-19"
     }
   ]
 }

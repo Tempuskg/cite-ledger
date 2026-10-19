@@ -15,14 +15,13 @@ These are the only claims Cite Ledger's README, product page, Marketplace and Op
 | <a id="l1"></a>L1 | Does not check DOIs registered outside Crossref, for example DataCite. | [Limits](limits.md#l1) |
 | <a id="l2"></a>L2 | Crossref's retraction data can miss some retractions. | [Limits](limits.md#l2) |
 | <a id="l3"></a>L3 | 'Unverified' means no matching record was found, not that the reference is fabricated. | [Limits](limits.md#l3) |
+| <a id="p7"></a>P7 | Reads .bib files, LaTeX thebibliography lists and Markdown reference sections. | Tests: `reads entries, fields, DOIs and lines from the fixture`, `reads thebibliography items, \doi and ignores comments`, `reads the References section, inline DOIs in prose, and skips code fences` |
+| <a id="p8"></a>P8 | Pro adds workspace-wide scans, CLI/CI exit codes, Markdown, CSV and JSON reports, and closest-match suggestions. | Tests: `unlocks workspace scan, exit codes, export and closest match`, `Markdown, CSV and JSON reports carry evidence links and limits L1-L3` |
+| <a id="p9"></a>P9 | Makes no AI model calls: every check is a lookup in Crossref's records. | Test: `P5: checking every fixture file calls only api.crossref.org and sends no prose` |
+| <a id="p10"></a>P10 | A Pro licence check sends your licence key, and no reference data, to Polar, the payment provider. | Test: `licence validation sends only the key and public identifiers, with no secret` |
+
+P1–P6 and L1–L3 were accepted on 2026-10-19 with the marketing standing instruction. P7–P10 were accepted on 2026-10-19 after the first build.
 
 ## Proposed, not yet usable
 
-These may not appear on any public surface until they are accepted.
-
-| ID | Proposed claim | Evidence |
-| --- | --- | --- |
-| P7 | Reads .bib files, LaTeX thebibliography lists and Markdown reference sections. | Parser fixture tests |
-| P8 | Pro adds workspace-wide scans, CLI/CI exit codes, Markdown, CSV and JSON reports, and closest-match suggestions. | Pro gating and report tests |
-| P9 | Makes no AI model calls: every check is a lookup in Crossref's records. | Network test |
-| P10 | A Pro licence check sends your licence key, and no reference data, to Polar, the payment provider. | Licence request test |
+None at present. A new claim is added here first, with its test, and may not appear on any public surface until it is accepted.
