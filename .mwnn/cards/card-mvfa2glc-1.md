@@ -1,11 +1,11 @@
 ---
 id: card-mvfa2glc-1
 title: "Create the Polar product and licence-key benefit, and set the Pro price"
-column: col-mvfa2glc-3
+column: col-mvfa2glc-5
 position: 1000
 assignee: { kind: human, name: Darren McLeod }
 createdAt: 1792415841150
-updatedAt: 1792417655542
+updatedAt: 1792454001602
 ---
 
 ## Description
