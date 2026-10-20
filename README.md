@@ -2,7 +2,7 @@
 
 Cite Ledger is an extension for VS Code-compatible editors, with a command-line tool, for checking reference lists against [Crossref](https://www.crossref.org/).
 
-> **Pre-release.** Cite Ledger is not yet published to the VS Code Marketplace or Open VSX, and nothing is on sale. This repository is where it is being built and tested.
+> **Pre-release.** Cite Ledger is not yet published to the VS Code Marketplace or Open VSX. This repository is where it is being built and tested.
 
 ## What it checks
 
@@ -13,6 +13,13 @@ Cite Ledger is an extension for VS Code-compatible editors, with a command-line 
 - Marks references with no matching Crossref record as unverified. <sup>[P4](docs/claim-register.md#p4)</sup>
 
 Every finding links to its evidence, such as the Crossref record or the retraction notice, and says how it could be wrong.
+
+## Free and Pro
+
+- Single-file checks are free; Pro is a one-time licence. <sup>[P6](docs/claim-register.md#p6)</sup>
+- Pro adds workspace-wide scans, CLI/CI exit codes, Markdown, CSV and JSON reports, and closest-match suggestions. <sup>[P8](docs/claim-register.md#p8)</sup>
+
+Pro costs USD $12, as listed on the [Polar product page](https://buy.polar.sh/polar_cl_sTahdpEXRlwOfOi2HwXgYerl2LRAoQTpoGNr909TkK1) ("This is a one-time charge").
 
 ## What leaves your machine
 

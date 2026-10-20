@@ -53,11 +53,14 @@
 
     <h2>What it checks</h2>
     <ul>
+      <li><span data-claim="P7">Reads .bib files, LaTeX thebibliography lists and Markdown reference sections.</span><span class="tag">P7</span></li>
       <li><span data-claim="P1">Flags references whose DOI does not resolve in Crossref.</span><span class="tag">P1</span></li>
       <li><span data-claim="P2">Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data.</span><span class="tag">P2</span></li>
       <li><span data-claim="P3">Shows where an entry&#39;s title, year or first author differs from the Crossref record.</span><span class="tag">P3</span></li>
       <li><span data-claim="P4">Marks references with no matching Crossref record as unverified.</span><span class="tag">P4</span></li>
       <li><span data-claim="P5">Runs on your machine and sends only the reference details it looks up to Crossref.</span><span class="tag">P5</span></li>
+      <li><span data-claim="P9">Makes no AI model calls: every check is a lookup in Crossref&#39;s records.</span><span class="tag">P9</span></li>
+      <li><span data-claim="P10">A Pro licence check sends your licence key, and no reference data, to Polar, the payment provider.</span><span class="tag">P10</span></li>
     </ul>
     <p>Every finding links to its evidence and says how it could be wrong. Each claim above is backed by a test that must pass before a release: see the <a href="https://github.com/Tempuskg/cite-ledger/blob/main/docs/claim-register.md">claim register</a>.</p>
 
@@ -69,7 +72,14 @@
     </ul>
     <p>More detail, including exactly what leaves your machine: <a href="https://github.com/Tempuskg/cite-ledger/blob/main/docs/limits.md">limits</a>.</p>
 
-    <!-- LAUNCH: add install links (Marketplace, Open VSX, VSIX download) and the P6 line with the price quoted from the live Polar page. -->
+    <h2>Free and Pro</h2>
+    <ul>
+      <li><span data-claim="P6">Single-file checks are free; Pro is a one-time licence.</span><span class="tag">P6</span></li>
+      <li><span data-claim="P8">Pro adds workspace-wide scans, CLI/CI exit codes, Markdown, CSV and JSON reports, and closest-match suggestions.</span><span class="tag">P8</span></li>
+    </ul>
+    <p>Pro costs USD $12, as listed on the <a href="https://buy.polar.sh/polar_cl_sTahdpEXRlwOfOi2HwXgYerl2LRAoQTpoGNr909TkK1">Polar product page</a> (&quot;This is a one-time charge&quot;).</p>
+
+    <!-- LAUNCH: add install links (Marketplace, Open VSX, VSIX download). -->
 
     <h2>Found a wrong finding?</h2>
     <p>Please <a href="https://github.com/Tempuskg/cite-ledger/issues/new?template=wrong-finding.yml">report it</a>. A wrong finding is a defect.</p>
