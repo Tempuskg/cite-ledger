@@ -6,6 +6,7 @@ import { LIMITS, LIMITS_URL, limitsLine } from './core/limits';
 import { kindForFile } from './core/parse';
 import { isAllowed, proRequiredMessage, type ProFeature } from './core/pro';
 import { renderReport, type ReportFormat } from './core/report';
+import { checkResultMessage, findingLines, firstFinding, SHOW_FINDINGS, SHOW_LIMITS, SHOW_OUTPUT } from './core/summary';
 import type { FileReport, Finding, Severity } from './core/types';
 
 declare const CITE_LEDGER_VERSION: string | undefined;
@@ -98,11 +99,24 @@ export function activate(context: vscode.ExtensionContext): void {
     return report;
   }
 
-  function summarize(reports: readonly FileReport[]): string {
-    const results = reports.flatMap((report) => report.results);
-    const findings = results.flatMap((result) => result.findings).length;
-    const notes = reports.flatMap((report) => report.notes);
-    return `Cite Ledger checked ${results.length} reference(s) in ${reports.length} file(s) against Crossref: ${findings} finding(s).${notes.length > 0 ? ` ${notes.join(' ')}` : ''}`;
+  /** Logs the run, then shows its result with buttons that lead to the findings. */
+  async function showResult(reports: readonly FileReport[], document?: vscode.TextDocument): Promise<void> {
+    const result = checkResultMessage(reports);
+    output.appendLine(result.text);
+    reports.forEach((report) => findingLines(report).forEach((line) => output.appendLine(line)));
+    const choice = await vscode.window.showInformationMessage(result.text, ...result.actions);
+    if (choice === SHOW_FINDINGS) {
+      const first = reports.length === 1 && reports[0] ? firstFinding(reports[0]) : undefined;
+      if (document && first) {
+        const start = new vscode.Position(first.startLine, 0);
+        await vscode.window.showTextDocument(document, { selection: new vscode.Range(start, start), preserveFocus: false });
+      }
+      await vscode.commands.executeCommand('workbench.actions.view.problems');
+    } else if (choice === SHOW_OUTPUT) {
+      output.show(true);
+    } else if (choice === SHOW_LIMITS) {
+      await vscode.commands.executeCommand('citeLedger.showLimits');
+    }
   }
 
   async function checkActiveFile(document?: vscode.TextDocument): Promise<void> {
@@ -117,8 +131,7 @@ export function activate(context: vscode.ExtensionContext): void {
       () => checkDocument(target, crossref(), pro),
     );
     if (report) {
-      output.appendLine(summarize([report]));
-      void vscode.window.showInformationMessage(summarize([report]));
+      void showResult([report], target);
     }
   }
 
@@ -148,8 +161,7 @@ export function activate(context: vscode.ExtensionContext): void {
           }
         },
       );
-      output.appendLine(summarize(reports));
-      void vscode.window.showInformationMessage(summarize(reports));
+      void showResult(reports);
     }),
 
     vscode.commands.registerCommand('citeLedger.exportReport', async () => {
