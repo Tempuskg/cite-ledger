@@ -18,7 +18,7 @@ export interface ReferenceEntry {
   readonly rawText: string;
   /** True when title, year and author come from named fields (BibTeX). */
   readonly structured: boolean;
-  /** False for a DOI found in prose outside a reference list: only P1 and P2 checks apply. */
+  /** False for a DOI found in prose outside a reference list, or a further DOI in a reference that holds several: only P1 and P2 checks apply. */
   readonly inReferenceList: boolean;
   /** Set when the entry is deliberately not looked up, for example a web page with no DOI. */
   readonly skipReason?: string;

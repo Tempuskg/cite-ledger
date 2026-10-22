@@ -3,6 +3,8 @@ import type { ParseResult, ReferenceEntry } from './types';
 
 const REFERENCE_HEADING = /^(#{1,6})\s*(?:references|bibliography|works cited|sources|citations|literature cited|reference list)\b/i;
 const ITEM_START = /^\s{0,3}(?:[-*+]|\d+[.)]|\[\d+\]|\[\^[^\]]+\]:)\s+/;
+const TABLE_ROW = /^\s{0,3}\|/;
+const TABLE_SEPARATOR = /^\s{0,3}\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)*\|?\s*$/;
 
 function plain(markdown: string): string {
   return markdown
@@ -31,6 +33,15 @@ function referenceBlocks(lines: readonly string[], from: number, to: number): Bl
   };
   for (let i = from; i < to; i++) {
     const line = lines[i];
+    if (TABLE_ROW.test(line)) {
+      // Each table row is one reference; the header row (followed by a separator) and the separator are not.
+      flush();
+      const header = i + 1 < to && TABLE_SEPARATOR.test(lines[i + 1]);
+      if (!header && !TABLE_SEPARATOR.test(line)) {
+        blocks.push({ start: i, end: i, text: line.replace(/\|/g, ' ') });
+      }
+      continue;
+    }
     if (line.trim() === '') {
       if (!hasItems) {
         flush();
@@ -89,7 +100,7 @@ export function parseMarkdown(text: string): ParseResult {
         continue;
       }
       const raw = plain(block.text);
-      const [doi] = extractDois(block.text);
+      const [doi, ...others] = extractDois(block.text);
       const query = stripUrls(raw).replace(/\s+/g, ' ').trim();
       entries.push({
         id: `line ${block.start + 1}`,
@@ -105,6 +116,25 @@ export function parseMarkdown(text: string): ParseResult {
       });
       for (let line = block.start; line <= block.end; line++) {
         covered.add(line);
+      }
+      // The block text belongs to its first DOI, so further DOIs are checked on their own (P1 and P2 only).
+      for (const other of others) {
+        const index = lines.findIndex((line, n) => n >= block.start && n <= block.end && extractDois(line).includes(other));
+        const at = index >= 0 ? index : block.start;
+        entries.push({
+          id: `line ${at + 1}`,
+          kind: 'markdown',
+          startLine: at,
+          endLine: at,
+          doi: other,
+          queryText: '',
+          rawText: plain(lines[at]),
+          structured: false,
+          inReferenceList: false,
+        });
+      }
+      if (others.length > 0) {
+        notes.push(`The reference at line ${block.start + 1} holds ${others.length + 1} DOIs. Each is checked, but only the first is compared with the reference text.`);
       }
     }
     i = end - 1;

@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
 import { describe, test } from 'node:test';
 import { parseBibtex } from '../src/core/bibtex';
 import { parseLatex } from '../src/core/latex';
 import { parseMarkdown } from '../src/core/markdown';
 import { extractDois, firstAuthorFamily, normalizeDoi, stripUpdatePrefix, titleSimilarity } from '../src/core/normalize';
 import { kindForFile } from '../src/core/parse';
-import { fixtureFile } from './helpers';
+import { FIXTURES, fixtureFile } from './helpers';
 
 describe('BibTeX parser', () => {
   test('reads entries, fields, DOIs and lines from the fixture', () => {
@@ -62,6 +64,35 @@ describe('Markdown parser', () => {
     assert.match(entries[3].queryText, /under lunar gravity/);
     assert.ok(entries.every((entry) => !entry.rawText.includes('SENTINEL')));
     assert.deepEqual(notes, ['References for this file are in refs.bib. Open it and check it there.']);
+  });
+
+  test('reads each table row in a reference section as its own entry, and keeps every DOI', () => {
+    const { entries, notes } = parseMarkdown(readFileSync(path.join(FIXTURES, 'parsers', 'table.md'), 'utf8'));
+    assert.deepEqual(entries.map((entry) => [entry.id, entry.inReferenceList, entry.doi ?? null]), [
+      ['line 7', true, '10.5555/cite-ledger-list-0001'],
+      ['line 8', true, '10.5555/cite-ledger-list-0002'],
+      ['line 8', false, '10.5555/cite-ledger-list-0003'],
+      ['line 12', true, '10.1038/nature14539'],
+      ['line 13', true, '10.5555/cite-ledger-unregistered-0000'],
+      ['line 14', true, null],
+      ['line 15', true, '10.5555/cite-ledger-table-0004'],
+      ['line 17', true, '10.5555/cite-ledger-list-0005'],
+    ]);
+    assert.ok(entries.every((entry) => entry.startLine === entry.endLine));
+    assert.ok(entries.every((entry) => !/Topic|---|\|/.test(entry.rawText)));
+    assert.match(entries[3].queryText, /Deep learning/);
+    assert.equal(entries[5].skipReason, undefined);
+    assert.deepEqual(notes, ['The reference at line 8 holds 2 DOIs. Each is checked, but only the first is compared with the reference text.']);
+  });
+
+  test('never drops a further DOI in a reference block', () => {
+    const text = ['## References', '', '1. Example, A. (2020). A first work. 10.5555/a-0001', '   Its companion work. 10.5555/a-0002', '   Its data. 10.5555/a-0003'].join('\n');
+    const { entries } = parseMarkdown(text);
+    assert.deepEqual(entries.map((entry) => [entry.id, entry.doi]), [
+      ['line 3', '10.5555/a-0001'],
+      ['line 4', '10.5555/a-0002'],
+      ['line 5', '10.5555/a-0003'],
+    ]);
   });
 });
 

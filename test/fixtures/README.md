@@ -1,6 +1,6 @@
 # Test fixtures
 
-`crossref/` holds Crossref REST API responses recorded on 2026-10-19 from `api.crossref.org`, trimmed to the fields Cite Ledger reads. `files/` holds the reference files the tests check.
+`crossref/` holds Crossref REST API responses recorded on 2026-10-19 from `api.crossref.org`, trimmed to the fields Cite Ledger reads. `files/` holds the reference files the tests check. `parsers/table.md` is a parser-only fixture, kept out of `files/` so the workspace scans do not pick it up: a reference section that mixes list items with a Markdown table of DOIs. Its `10.5555/cite-ledger-*` DOIs are made up and its authors are placeholders.
 
 | Fixture | Source request | Used for |
 | --- | --- | --- |
