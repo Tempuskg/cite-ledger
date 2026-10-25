@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (not yet released)
+## 0.1.0 (2026-10-25)
 
 First version. Each claim below is in the [claim register](docs/claim-register.md) and backed by the named test.
 
