@@ -2,7 +2,7 @@
 
 Cite Ledger is an extension for VS Code-compatible editors, with a command-line tool, for checking reference lists against [Crossref](https://www.crossref.org/).
 
-> **Pre-release.** Cite Ledger is not yet published to the VS Code Marketplace or Open VSX. This repository is where it is being built and tested.
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=darrenjmcleod.cite-ledger) or [Open VSX](https://open-vsx.org/extension/darrenjmcleod/cite-ledger) (v0.1.0), or see the [product page](https://tempuskg.github.io/cite-ledger/).
 
 ## What it checks
 

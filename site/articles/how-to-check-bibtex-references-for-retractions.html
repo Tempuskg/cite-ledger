@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to check BibTeX references for retractions — Cite Ledger</title>
+  <meta name="description" content="A worked example of checking a .bib file for retractions recorded in Crossref.">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --fg: #1d2421;
+      --muted: #55615c;
+      --rule: #d9ddd8;
+      --accent: #1f6f5c;
+      --panel: #f0f2ee;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141917;
+        --fg: #e6ebe8;
+        --muted: #a3b0aa;
+        --rule: #2d3632;
+        --accent: #6cc4a8;
+        --panel: #1c2320;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 17px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 44rem; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+    h1 { font-size: 2rem; line-height: 1.25; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.25rem; margin: 2.5rem 0 0.75rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+    p.lead { color: var(--muted); font-size: 1.05rem; margin-top: 0; }
+    a { color: var(--accent); }
+    ul, ol { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+    .tag { color: var(--muted); font-size: 0.8rem; margin-left: 0.25rem; }
+    .note { background: var(--panel); border-left: 3px solid var(--accent); padding: 0.75rem 1rem; }
+    code { background: var(--panel); padding: 0.1rem 0.3rem; border-radius: 3px; }
+    pre {
+      background: var(--panel);
+      padding: 0.9rem 1rem;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    footer { margin-top: 3rem; color: var(--muted); font-size: 0.9rem; }
+    .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.25rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="crumb"><a href="../index.html">Cite Ledger</a> · Article</p>
+    <h1>How to check BibTeX references for retractions</h1>
+    <p class="lead">A free single-file check against Crossref, with a worked example that uses a public retraction notice.</p>
+
+    <p>On 2025-01-29 Crossref announced that Retraction Watch retractions are available in its REST API, so tools that look up works can surface those notices alongside publisher updates (<a href="https://www.crossref.org/blog/retraction-watch-retractions-now-in-the-crossref-api/">Crossref, 2025-01-29</a>). If a <code>.bib</code> file still cites a retracted work, that notice is easy to miss until something looks it up.</p>
+
+    <h2>Worked example</h2>
+    <p>Take this BibTeX entry. Its DOI is a real Crossref work that has a retraction recorded in Crossref (via Retraction Watch). The entry below uses placeholder author and title fields on purpose; the check keys on the DOI.</p>
+<pre><code>@article{example1998,
+  author = {Example, A.},
+  title  = {An example entry for a DOI check},
+  journal = {Example Journal},
+  year   = {1998},
+  doi    = {10.1016/S0140-6736(97)11096-0}
+}</code></pre>
+    <p>The public Crossref record for that DOI is <a href="https://doi.org/10.1016/s0140-6736(97)11096-0">https://doi.org/10.1016/s0140-6736(97)11096-0</a>. Crossref lists a retraction update whose notice is <a href="https://doi.org/10.1016/s0140-6736(10)60175-4">https://doi.org/10.1016/s0140-6736(10)60175-4</a> (dated 2010-02-06 in the Crossref metadata). Cite Ledger reports that as a retraction finding and links the notice; it does not name or characterise the authors of the retracted work.</p>
+
+    <h2>Steps (free tier)</h2>
+    <ol>
+      <li>Install Cite Ledger from the <a href="https://marketplace.visualstudio.com/items?itemName=darrenjmcleod.cite-ledger">VS Code Marketplace</a> or <a href="https://open-vsx.org/extension/darrenjmcleod/cite-ledger">Open VSX</a>.</li>
+      <li>Open your <code>.bib</code> file.</li>
+      <li>Run <strong>Cite Ledger: Check References in This File</strong> from the Command Palette (or use the checklist button in the editor title bar).</li>
+      <li>Open the Problems panel. Each finding names its claim and links to its evidence.</li>
+    </ol>
+    <p><span data-claim="P6">Single-file checks are free; Pro is a one-time licence.</span><span class="tag">P6</span> Retraction flags are included on the free single-file path.</p>
+    <ul>
+      <li><span data-claim="P2">Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data.</span><span class="tag">P2</span></li>
+      <li><span data-claim="P5">Runs on your machine and sends only the reference details it looks up to Crossref.</span><span class="tag">P5</span></li>
+    </ul>
+
+    <h2>Limits</h2>
+    <ul>
+      <li><span data-claim="L1">Does not check DOIs registered outside Crossref, for example DataCite.</span><span class="tag">L1</span></li>
+      <li><span data-claim="L2">Crossref&#39;s retraction data can miss some retractions.</span><span class="tag">L2</span></li>
+      <li><span data-claim="L3">&#39;Unverified&#39; means no matching record was found, not that the reference is fabricated.</span><span class="tag">L3</span></li>
+    </ul>
+    <p>More detail: <a href="https://github.com/Tempuskg/cite-ledger/blob/main/docs/limits.md">limits</a>.</p>
+
+    <h2>Found a wrong finding?</h2>
+    <p>Please <a href="https://github.com/Tempuskg/cite-ledger/issues/new?template=wrong-finding.yml">report it</a>. A wrong finding is a defect.</p>
+
+    <p class="note">Drafted with AI assistance and checked against the linked sources.</p>
+
+    <footer>
+      <p><a href="../index.html">Cite Ledger</a> · Sources: <a href="https://www.crossref.org/blog/retraction-watch-retractions-now-in-the-crossref-api/">Crossref blog, 2025-01-29</a>; DOI <a href="https://doi.org/10.1016/s0140-6736(97)11096-0">10.1016/s0140-6736(97)11096-0</a>; retraction notice <a href="https://doi.org/10.1016/s0140-6736(10)60175-4">10.1016/s0140-6736(10)60175-4</a>.</p>
+    </footer>
+  </main>
+</body>
+</html>
