@@ -21,7 +21,7 @@ function counts(reports: readonly FileReport[]): string {
   const results = reports.flatMap((report) => report.results);
   const by = (status: string) => results.filter((result) => result.status === status).length;
   return `${results.length} references in ${reports.length} file(s): ${by('verified')} found by DOI, ${by('matched')} matched by search, ` +
-    `${by('not-found')} DOI not found, ${by('unverified')} unverified, ${by('skipped')} not looked up, ${by('error')} not checked.`;
+    `${by('not-found')} DOI not found, ${by('other-agency')} registered outside Crossref, ${by('unverified')} unverified, ${by('skipped')} not looked up, ${by('error')} not checked.`;
 }
 
 function markdownCell(text: string): string {

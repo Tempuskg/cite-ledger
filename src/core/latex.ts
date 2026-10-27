@@ -1,4 +1,4 @@
-import { extractDois, latexToPlain, stripUrls } from './normalize';
+import { arxivIdIn, extractDois, latexToPlain, stripUrls } from './normalize';
 import type { ParseResult, ReferenceEntry } from './types';
 
 function lineAt(text: string, offset: number): number {
@@ -34,6 +34,7 @@ export function parseLatex(text: string): ParseResult {
       const itemText = source.slice(textStart, end);
       const [doi] = extractDois(itemText);
       const plain = latexToPlain(itemText).replace(/\s+/g, ' ').trim();
+      const arxivId = arxivIdIn(plain);
       const trimmedEnd = start + item[0].length + itemText.trimEnd().length;
       entries.push({
         id: item[1].trim() || `line ${lineAt(source, start) + 1}`,
@@ -45,6 +46,7 @@ export function parseLatex(text: string): ParseResult {
         rawText: plain,
         structured: false,
         inReferenceList: true,
+        ...(arxivId ? { arxivId } : {}),
         ...(!doi && stripUrls(plain).trim() === '' ? { skipReason: 'Empty reference.' } : {}),
       });
     });

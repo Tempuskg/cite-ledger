@@ -67,7 +67,7 @@ describe('Pro with a Polar licence key', () => {
     const code = await main(['check', FILES, '--license-key', 'KEY-123', '--fail-on', 'retraction', '--report', report], deps);
     assert.equal(code, 1, 'exit 1: a retraction was found');
     const text = out.join('');
-    assert.match(text, /Checked \d+ references in 3 file\(s\)/);
+    assert.match(text, /Checked \d+ references in 4 file\(s\)/);
     assert.match(text, /Closest match: /);
     const csv = readFileSync(report, 'utf8');
     assert.match(csv, /^file,line,entry,kind,claim,severity,message,evidence,could_be_wrong,limits\r\n/);

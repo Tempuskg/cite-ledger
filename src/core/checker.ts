@@ -1,4 +1,5 @@
 import {
+  agencyEvidenceUrl,
   CrossrefError,
   firstAuthorOfWork,
   searchEvidenceUrl,
@@ -8,6 +9,7 @@ import {
   type CrossrefClient,
   type CrossrefUpdate,
   type CrossrefWork,
+  type AgencyLookup,
 } from './crossref';
 import { LIMITS } from './limits';
 import { coverage, normalizeText, sameFamilyName, stripUpdatePrefix, stripUrls, titleSimilarity, tokens, yearsIn } from './normalize';
@@ -212,6 +214,48 @@ function closestMatch(entry: ReferenceEntry, candidates: readonly CrossrefWork[]
   return best;
 }
 
+/** Crossref's agency lookup for a DOI it has no record of; undefined when the lookup fails. */
+async function agencyOf(doi: string, crossref: CrossrefClient): Promise<AgencyLookup | undefined> {
+  try {
+    return await crossref.getAgency(doi);
+  } catch {
+    return undefined;
+  }
+}
+
+/** A DOI with no Crossref record: an info finding when another agency registered it, otherwise P1. */
+async function notInCrossref(entry: ReferenceEntry, doi: string, crossref: CrossrefClient): Promise<EntryResult> {
+  const lookup = await agencyOf(doi, crossref);
+  if (lookup?.status === 'found' && lookup.agency.id !== 'crossref') {
+    const agency = lookup.agency.label;
+    return {
+      entry,
+      status: 'other-agency',
+      findings: [finding(entry, 'other-agency', 'P1', 'info',
+        `DOI ${doi} is registered with ${agency}, not Crossref. Cite Ledger does not check DOIs registered outside Crossref (L1).`,
+        [
+          { url: agencyEvidenceUrl(doi), label: `Crossref agency lookup for ${doi} (${agency})` },
+          { url: doiUrl(doi), label: `doi.org resolver for ${doi}` },
+        ],
+        `This says only who registered the DOI. The work's title, year, authors and any retraction were not checked: open the doi.org link to see the ${agency} record.`)],
+    };
+  }
+  const couldBeWrong = lookup?.status === 'not-found'
+    ? "Crossref's agency lookup found no registration agency for this DOI, so it may be mistyped. If another agency such as DataCite registered it (L1), the doi.org link shows whether it resolves there."
+    : 'The DOI may be registered with another agency such as DataCite (L1): open the doi.org link to see whether it resolves there. It may also be mistyped.';
+  return {
+    entry,
+    status: 'not-found',
+    findings: [finding(entry, 'doi-not-found', 'P1', 'warning',
+      `DOI ${doi} does not resolve in Crossref.`,
+      [
+        { url: workEvidenceUrl(doi), label: `Crossref lookup for ${doi} (not found)` },
+        { url: doiUrl(doi), label: `doi.org resolver for ${doi}` },
+      ],
+      couldBeWrong)],
+  };
+}
+
 async function checkEntry(entry: ReferenceEntry, options: CheckOptions): Promise<EntryResult> {
   if (entry.skipReason) {
     return { entry, status: 'skipped', findings: [] };
@@ -220,17 +264,7 @@ async function checkEntry(entry: ReferenceEntry, options: CheckOptions): Promise
     if (entry.doi) {
       const lookup = await options.crossref.getWork(entry.doi);
       if (lookup.status === 'not-found') {
-        return {
-          entry,
-          status: 'not-found',
-          findings: [finding(entry, 'doi-not-found', 'P1', 'warning',
-            `DOI ${entry.doi} does not resolve in Crossref.`,
-            [
-              { url: workEvidenceUrl(entry.doi), label: `Crossref lookup for ${entry.doi} (not found)` },
-              { url: doiUrl(entry.doi), label: `doi.org resolver for ${entry.doi}` },
-            ],
-            'The DOI may be registered with another agency such as DataCite (L1): open the doi.org link to see whether it resolves there. It may also be mistyped.')],
-        };
+        return notInCrossref(entry, entry.doi, options.crossref);
       }
       const work = lookup.work;
       const comparisons = !entry.inReferenceList ? [] : entry.structured ? compareStructured(entry, work) : compareFreeText(entry, work);
@@ -243,9 +277,13 @@ async function checkEntry(entry: ReferenceEntry, options: CheckOptions): Promise
       return { entry, status: 'matched', crossrefDoi: match.DOI.toLowerCase(), findings: updateFindings(entry, match) };
     }
     const closest = options.pro ? closestMatch(entry, candidates) : undefined;
+    const arxiv = entry.arxivId
+      ? ` This entry is the arXiv preprint arXiv:${entry.arxivId}, whose DOI is registered with DataCite, which Cite Ledger does not check (L1).`
+      : '';
     const message = closest
-      ? `Unverified: no matching Crossref record found. Closest match: "${closest.title}"${closest.year ? ` (${closest.year})` : ''}, ${closest.doi}, similarity ${closest.similarity}.`
-      : 'Unverified: no matching Crossref record found.';
+      ? `Unverified: no matching Crossref record found. Closest match: "${closest.title}"${closest.year ? ` (${closest.year})` : ''}, ${closest.doi}, similarity ${closest.similarity}.${arxiv}`
+      : `Unverified: no matching Crossref record found.${arxiv}`;
+    const arxivDoi = entry.arxivId ? `10.48550/arXiv.${entry.arxivId}` : undefined;
     return {
       entry,
       status: 'unverified',
@@ -253,8 +291,11 @@ async function checkEntry(entry: ReferenceEntry, options: CheckOptions): Promise
         [
           { url: searchEvidenceUrl(entry.queryText), label: 'Crossref search for this reference' },
           ...(closest ? [{ url: closest.url, label: `Closest match ${closest.doi}` }] : []),
+          ...(arxivDoi ? [{ url: doiUrl(arxivDoi), label: `doi.org resolver for the arXiv DOI ${arxivDoi}` }] : []),
         ],
-        'The work may exist without a Crossref record: books, reports, theses, preprints and web pages often have none (L3).',
+        arxivDoi
+          ? 'No matching Crossref record does not mean the preprint is fabricated (L3): arXiv preprints are registered with DataCite, not Crossref (L1). Open the doi.org link to see the arXiv record; if it does not resolve, the arXiv identifier may be mistyped. A published version may also be in Crossref under a different title or year.'
+          : 'The work may exist without a Crossref record: books, reports, theses, preprints and web pages often have none (L3).',
         closest ? { closestMatch: closest } : {})],
     };
   } catch (error) {

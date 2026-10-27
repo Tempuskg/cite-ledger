@@ -55,6 +55,12 @@ export function extractDois(text: string): string[] {
   return found;
 }
 
+/** An arXiv identifier written as `arXiv:NNNN.NNNNN` (version dropped), or undefined. A passing mention of arXiv is not one. */
+export function arxivIdIn(text: string): string | undefined {
+  const match = /\barXiv:\s*(\d{4}\.\d{4,5})(?:v\d+)?(?!\d|\.\d)/i.exec(text);
+  return match ? match[1] : undefined;
+}
+
 /** Removes LaTeX markup that affects comparison: accents, commands, braces and ties. */
 export function latexToPlain(text: string): string {
   return text

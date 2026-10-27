@@ -5,7 +5,7 @@ import { describe, test } from 'node:test';
 import { parseBibtex } from '../src/core/bibtex';
 import { parseLatex } from '../src/core/latex';
 import { parseMarkdown } from '../src/core/markdown';
-import { extractDois, firstAuthorFamily, normalizeDoi, stripUpdatePrefix, titleSimilarity } from '../src/core/normalize';
+import { arxivIdIn, extractDois, firstAuthorFamily, normalizeDoi, stripUpdatePrefix, titleSimilarity } from '../src/core/normalize';
 import { kindForFile } from '../src/core/parse';
 import { FIXTURES, fixtureFile } from './helpers';
 
@@ -97,6 +97,25 @@ describe('Markdown parser', () => {
 });
 
 describe('normalization', () => {
+  test('reads an arXiv identifier only when it is written as arXiv:NNNN.NNNNN', () => {
+    assert.equal(arxivIdIn('arXiv:1412.6980'), '1412.6980');
+    assert.equal(arxivIdIn('Preprint, arXiv: 1706.03762v7.'), '1706.03762');
+    assert.equal(arxivIdIn('ARXIV:0704.0001'), '0704.0001');
+    assert.equal(arxivIdIn('See also arXiv for a later version'), undefined);
+    assert.equal(arxivIdIn('arXiv preprint 1412.6980'), undefined);
+    assert.equal(arxivIdIn('arXiv:1412.698012'), undefined);
+  });
+
+  test('BibTeX: eprint is an arXiv identifier only with archivePrefix or eprinttype arXiv', () => {
+    const ids = parseBibtex([
+      '@misc{a, title = {A}, eprint = {arXiv:1412.6980v2}, archivePrefix = {arXiv}}',
+      '@misc{b, title = {B}, eprint = {hep-th/9901001}, eprinttype = {arxiv}}',
+      '@misc{c, title = {C}, eprint = {12345}, eprinttype = {pubmed}}',
+      '@misc{d, title = {D}, note = {see also arXiv}}',
+    ].join('\n')).entries.map((entry) => entry.arxivId);
+    assert.deepEqual(ids, ['1412.6980', 'hep-th/9901001', undefined, undefined]);
+  });
+
   test('extracts DOIs and keeps balanced parentheses', () => {
     assert.deepEqual(extractDois('See (doi:10.1000/xyz). And https://doi.org/10.1016/S0140-6736(97)11096-0, then 10.1234/a.b;'), [
       '10.1000/xyz',

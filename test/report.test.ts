@@ -28,7 +28,23 @@ describe('exportable report', () => {
   test('Markdown report summarises the run', async () => {
     const text = renderReport(await reports(), 'md', meta);
     assert.match(text, /^# Cite Ledger report/);
-    assert.match(text, /7 references in 1 file\(s\): 3 found by DOI, 1 matched by search, 1 DOI not found, 1 unverified, 1 not looked up, 0 not checked\./);
+    assert.match(text, /7 references in 1 file\(s\): 3 found by DOI, 1 matched by search, 1 DOI not found, 0 registered outside Crossref, 1 unverified, 1 not looked up, 0 not checked\./);
+  });
+
+  test('a DOI registered with DataCite is counted and reported apart from DOI not found', async () => {
+    const crossref = createCrossrefClient({ fetch: fixtureFetch(), minIntervalMs: 0 });
+    const files = [await checkText('refs/agency.bib', fixtureFile('agency.bib'), 'bibtex', { crossref, pro: true })];
+    const md = renderReport(files, 'md', meta);
+    assert.match(md, /2 references in 1 file\(s\): 0 found by DOI, 0 matched by search, 0 DOI not found, 2 registered outside Crossref, 0 unverified/);
+    assert.match(md, /is registered with DataCite, not Crossref/);
+    assert.match(md, /\(https:\/\/api\.crossref\.org\/works\/10\.5281\/zenodo\.591564\/agency\)/);
+    const csv = renderReport(files, 'csv', meta).split('\r\n').filter((line) => line.includes('other-agency'));
+    assert.equal(csv.length, 2);
+    assert.ok(csv.every((line) => line.includes(',other-agency,P1,info,')));
+    const json = JSON.parse(renderReport(files, 'json', meta)) as { files: { results: { status: string; findings: { kind: string; severity: string }[] }[] }[] };
+    const results = json.files[0].results;
+    assert.deepEqual(results.map((result) => result.status), ['other-agency', 'other-agency']);
+    assert.ok(results.every((result) => result.findings.every((item) => item.kind === 'other-agency' && item.severity === 'info')));
   });
 
   test('CSV quotes cells with commas and quotes', async () => {

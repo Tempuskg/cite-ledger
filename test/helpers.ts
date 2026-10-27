@@ -43,8 +43,9 @@ export function fixtureFetch(recorded: RecordedRequest[] = [], other?: (url: URL
       const name = query.includes('deep learning') ? 'search-deep-learning.json' : 'search-no-match.json';
       return json(JSON.parse(readFileSync(path.join(crossref, name), 'utf8')));
     }
-    const doi = decodeURIComponent(url.pathname.replace(/^\/works\//, '')).toLowerCase();
-    const file = path.join(crossref, `work-${doi.replace('/', '_')}.json`);
+    const agency = url.pathname.endsWith('/agency');
+    const doi = decodeURIComponent(url.pathname.replace(/^\/works\//, '').replace(/\/agency$/, '')).toLowerCase();
+    const file = path.join(crossref, `${agency ? 'agency' : 'work'}-${doi.replace('/', '_')}.json`);
     if (!existsSync(file)) {
       return new Response('Resource not found.', { status: 404 });
     }

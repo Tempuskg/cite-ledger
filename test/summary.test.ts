@@ -26,6 +26,14 @@ describe('result message after a check', () => {
     assert.match(result.text, /^Cite Ledger: \d+ findings in 7 references in refs\/claims\.bib \(.*retraction.*\)\.$/);
   });
 
+  test('a DOI registered outside Crossref is counted apart from DOI not found', async () => {
+    const crossref = createCrossrefClient({ fetch: fixtureFetch(), minIntervalMs: 0 });
+    const report = await checkText('refs/agency.bib', fixtureFile('agency.bib'), 'bibtex', { crossref, pro: false });
+    const result = checkResultMessage([report]);
+    assert.equal(result.text, 'Cite Ledger: 2 findings in 2 references in refs/agency.bib (2 DOIs registered outside Crossref).');
+    assert.ok(findingLines(report).every((line) => line.includes('[P1 other-agency]')));
+  });
+
   test('a check with 0 findings says nothing was found and how many references were checked', () => {
     const result = checkResultMessage([cleanReport()]);
     assert.equal(result.findings, 0);

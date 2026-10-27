@@ -28,7 +28,7 @@ Options:
 Pro options:
   --fail-on <kinds>       Exit 1 when findings of these kinds exist. Comma list of:
                           retraction, expression-of-concern, correction, doi-not-found,
-                          mismatch, unverified, lookup-failed, any.
+                          other-agency, mismatch, unverified, lookup-failed, any.
   --report <file>         Write a report. Format from --format or the file extension.
   --format <md|csv|json>  Report format (default md).
 
@@ -40,10 +40,11 @@ const FAIL_ON_KINDS: Readonly<Record<string, readonly FindingKind[]>> = {
   'expression-of-concern': ['expression-of-concern'],
   correction: ['correction'],
   'doi-not-found': ['doi-not-found'],
+  'other-agency': ['other-agency'],
   mismatch: ['title-differs', 'year-differs', 'first-author-differs'],
   unverified: ['unverified'],
   'lookup-failed': ['lookup-failed'],
-  any: ['retraction', 'expression-of-concern', 'correction', 'other-update', 'doi-not-found', 'title-differs', 'year-differs', 'first-author-differs', 'unverified', 'lookup-failed'],
+  any: ['retraction', 'expression-of-concern', 'correction', 'other-update', 'doi-not-found', 'other-agency', 'title-differs', 'year-differs', 'first-author-differs', 'unverified', 'lookup-failed'],
 };
 
 const SKIP_DIRECTORIES = new Set(['node_modules', '.git', 'dist', 'out', 'build', '.venv', 'venv']);

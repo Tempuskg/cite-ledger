@@ -20,6 +20,8 @@ export interface ReferenceEntry {
   readonly structured: boolean;
   /** False for a DOI found in prose outside a reference list, or a further DOI in a reference that holds several: only P1 and P2 checks apply. */
   readonly inReferenceList: boolean;
+  /** The arXiv identifier when the entry is an arXiv preprint, without its version, such as "1412.6980". */
+  readonly arxivId?: string;
   /** Set when the entry is deliberately not looked up, for example a web page with no DOI. */
   readonly skipReason?: string;
 }
@@ -32,6 +34,7 @@ export interface ParseResult {
 
 export type FindingKind =
   | 'doi-not-found'
+  | 'other-agency'
   | 'retraction'
   | 'expression-of-concern'
   | 'correction'
@@ -88,7 +91,7 @@ export interface Finding {
   readonly closestMatch?: ClosestMatch;
 }
 
-export type EntryStatus = 'verified' | 'matched' | 'not-found' | 'unverified' | 'skipped' | 'error';
+export type EntryStatus = 'verified' | 'matched' | 'not-found' | 'other-agency' | 'unverified' | 'skipped' | 'error';
 
 export interface EntryResult {
   readonly entry: ReferenceEntry;

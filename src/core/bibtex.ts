@@ -1,4 +1,4 @@
-import { extractDois, firstAuthorFamily, latexToPlain, normalizeDoi } from './normalize';
+import { arxivIdIn, extractDois, firstAuthorFamily, latexToPlain, normalizeDoi } from './normalize';
 import type { ParseResult, ReferenceEntry } from './types';
 
 /** Entry types that usually describe web pages or software: without a DOI they are not looked up. */
@@ -173,6 +173,22 @@ function doiOf(fields: ReadonlyMap<string, string>): string | undefined {
   return undefined;
 }
 
+/** The arXiv identifier of an `eprint` with `archivePrefix` or `eprinttype` arXiv, or of `arXiv:NNNN.NNNNN` in `journal` or `note`. */
+function arxivIdOf(fields: ReadonlyMap<string, string>): string | undefined {
+  const prefix = (fields.get('archiveprefix') ?? fields.get('eprinttype') ?? '').trim().toLowerCase();
+  const eprint = fields.get('eprint')?.trim().replace(/^arxiv:\s*/i, '').replace(/v\d+$/, '');
+  if (prefix === 'arxiv' && eprint) {
+    return eprint;
+  }
+  for (const name of ['journal', 'note']) {
+    const id = arxivIdIn(fields.get(name) ?? '');
+    if (id) {
+      return id;
+    }
+  }
+  return undefined;
+}
+
 export function parseBibtex(text: string): ParseResult {
   const lines = new LineIndex(text);
   const entries: ReferenceEntry[] = parseBibEntries(text).map((bib) => {
@@ -182,6 +198,7 @@ export function parseBibtex(text: string): ParseResult {
     const family = author ? firstAuthorFamily(author) : undefined;
     const year = yearOf(fields);
     const doi = doiOf(fields);
+    const arxivId = arxivIdOf(fields);
     const venue = fields.get('journal') ?? fields.get('journaltitle') ?? fields.get('booktitle') ?? '';
     const queryText = latexToPlain([title, family, year, venue].filter((part) => part !== undefined && part !== '').join(' '))
       .replace(/\s+/g, ' ')
@@ -200,6 +217,7 @@ export function parseBibtex(text: string): ParseResult {
       rawText: queryText,
       structured: true,
       inReferenceList: true,
+      ...(arxivId ? { arxivId } : {}),
       ...(!doi && isWeb ? { skipReason: 'Web page or software entry with no DOI; not looked up.' } : {}),
       ...(!doi && !isWeb && !title ? { skipReason: 'No DOI and no title to look up.' } : {}),
     };

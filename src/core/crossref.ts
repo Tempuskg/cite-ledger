@@ -38,8 +38,18 @@ export interface CrossrefWork {
 
 export type WorkLookup = { readonly status: 'found'; readonly work: CrossrefWork } | { readonly status: 'not-found' };
 
+/** The registration agency Crossref names for a DOI, such as `{ id: 'datacite', label: 'DataCite' }`. */
+export interface WorkAgency {
+  readonly id: string;
+  readonly label: string;
+}
+
+export type AgencyLookup = { readonly status: 'found'; readonly agency: WorkAgency } | { readonly status: 'not-found' };
+
 export interface CrossrefClient {
   getWork(doi: string): Promise<WorkLookup>;
+  /** Which agency registered a DOI, from Crossref's `/works/{doi}/agency`. Asked when the DOI has no Crossref record. */
+  getAgency(doi: string): Promise<AgencyLookup>;
   search(bibliographic: string, rows?: number): Promise<CrossrefWork[]>;
 }
 
@@ -68,6 +78,11 @@ export function workEvidenceUrl(doi: string): string {
   return `${CROSSREF_BASE}/works/${encodeURI(doi)}`;
 }
 
+/** Public, mailto-free URL of Crossref's registration-agency lookup for a DOI, for evidence links. */
+export function agencyEvidenceUrl(doi: string): string {
+  return `${workEvidenceUrl(doi)}/agency`;
+}
+
 /** Public, mailto-free URL of a Crossref search, for evidence links. */
 export function searchEvidenceUrl(bibliographic: string, rows = 3): string {
   return `${CROSSREF_BASE}/works?query.bibliographic=${encodeURIComponent(bibliographic)}&rows=${rows}`;
@@ -90,6 +105,7 @@ export function createCrossrefClient(options: CrossrefClientOptions = {}): Cross
   let lastStart = 0;
   const waiting: (() => void)[] = [];
   const workCache = new Map<string, Promise<WorkLookup>>();
+  const agencyCache = new Map<string, Promise<AgencyLookup>>();
 
   async function acquire(): Promise<void> {
     if (active >= concurrency) {
@@ -152,16 +168,40 @@ export function createCrossrefClient(options: CrossrefClientOptions = {}): Cross
     return { status: 'found', work: body.message };
   }
 
+  async function getAgency(doi: string): Promise<AgencyLookup> {
+    const url = agencyEvidenceUrl(doi);
+    const response = await request(url);
+    if (response.status === 404) {
+      return { status: 'not-found' };
+    }
+    if (!response.ok) {
+      throw new CrossrefError(`Crossref answered ${response.status}`, url);
+    }
+    const body = (await response.json()) as { message?: { agency?: Partial<WorkAgency> } };
+    const agency = body.message?.agency;
+    if (!agency?.id) {
+      throw new CrossrefError('Crossref returned an agency record without an agency', url);
+    }
+    return { status: 'found', agency: { id: agency.id.toLowerCase(), label: agency.label || agency.id } };
+  }
+
+  function cached<T>(cache: Map<string, Promise<T>>, lookup: (doi: string) => Promise<T>, doi: string): Promise<T> {
+    const key = doi.toLowerCase();
+    let pending = cache.get(key);
+    if (!pending) {
+      pending = lookup(key);
+      cache.set(key, pending);
+      pending.catch(() => cache.delete(key));
+    }
+    return pending;
+  }
+
   return {
     getWork(doi: string): Promise<WorkLookup> {
-      const key = doi.toLowerCase();
-      let pending = workCache.get(key);
-      if (!pending) {
-        pending = getWork(key);
-        workCache.set(key, pending);
-        pending.catch(() => workCache.delete(key));
-      }
-      return pending;
+      return cached(workCache, getWork, doi);
+    },
+    getAgency(doi: string): Promise<AgencyLookup> {
+      return cached(agencyCache, getAgency, doi);
     },
     async search(bibliographic: string, rows = 3): Promise<CrossrefWork[]> {
       const url = `${searchEvidenceUrl(bibliographic, rows)}&select=${SEARCH_FIELDS}`;

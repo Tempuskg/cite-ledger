@@ -14,6 +14,7 @@ export interface CheckResultMessage {
 
 const KIND_LABELS: Readonly<Record<FindingKind, readonly [string, string]>> = {
   'doi-not-found': ['DOI not found', 'DOIs not found'],
+  'other-agency': ['DOI registered outside Crossref', 'DOIs registered outside Crossref'],
   retraction: ['retraction', 'retractions'],
   'expression-of-concern': ['expression of concern', 'expressions of concern'],
   correction: ['correction', 'corrections'],

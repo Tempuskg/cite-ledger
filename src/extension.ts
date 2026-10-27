@@ -49,6 +49,9 @@ function codeTarget(finding: Finding): string {
   if (finding.kind === 'unverified') {
     return `${LIMITS_URL}#l3`;
   }
+  if (finding.kind === 'other-agency') {
+    return `${LIMITS_URL}#l1`;
+  }
   return finding.evidence.find((item) => !item.url.includes('?'))?.url ?? LIMITS_URL;
 }
 

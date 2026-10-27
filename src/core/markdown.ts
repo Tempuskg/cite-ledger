@@ -1,4 +1,4 @@
-import { extractDois, stripUrls } from './normalize';
+import { arxivIdIn, extractDois, stripUrls } from './normalize';
 import type { ParseResult, ReferenceEntry } from './types';
 
 const REFERENCE_HEADING = /^(#{1,6})\s*(?:references|bibliography|works cited|sources|citations|literature cited|reference list)\b/i;
@@ -101,6 +101,7 @@ export function parseMarkdown(text: string): ParseResult {
       }
       const raw = plain(block.text);
       const [doi, ...others] = extractDois(block.text);
+      const arxivId = arxivIdIn(raw);
       const query = stripUrls(raw).replace(/\s+/g, ' ').trim();
       entries.push({
         id: `line ${block.start + 1}`,
@@ -112,6 +113,7 @@ export function parseMarkdown(text: string): ParseResult {
         rawText: raw,
         structured: false,
         inReferenceList: true,
+        ...(arxivId ? { arxivId } : {}),
         ...(!doi && query.split(' ').length < 3 ? { skipReason: 'No DOI and too little text to look up.' } : {}),
       });
       for (let line = block.start; line <= block.end; line++) {

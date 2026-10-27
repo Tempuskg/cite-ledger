@@ -6,7 +6,7 @@ Every finding Cite Ledger reports carries these three limits, and a statement of
 
 **Does not check DOIs registered outside Crossref, for example DataCite.**
 
-Cite Ledger looks DOIs up only in Crossref. Datasets, software and some preprints often have DataCite DOIs; Zenodo DOIs are an example. For one of those, Cite Ledger reports that the DOI "does not resolve in Crossref". That finding also links to `doi.org`, so you can see whether the DOI resolves elsewhere.
+Cite Ledger looks DOIs up only in Crossref. Datasets, software and some preprints often have DataCite DOIs; Zenodo and arXiv DOIs are examples. When a DOI is not in Crossref, Cite Ledger asks Crossref which agency registered it. If another agency, such as DataCite, registered it, Cite Ledger reports an info finding naming that agency and does not check the work further. If no agency is found, or the lookup fails, it reports that the DOI "does not resolve in Crossref". Both findings link to `doi.org`, so you can see whether the DOI resolves elsewhere.
 
 ## L2
 

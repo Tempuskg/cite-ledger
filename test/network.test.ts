@@ -40,7 +40,7 @@ describe('P5 network', () => {
   test('P5: checking every fixture file calls only api.crossref.org and sends no prose', async () => {
     recorded.length = 0;
     const crossref = createCrossrefClient({ minIntervalMs: 0, mailto: 'reader@example.org' });
-    const files: [string, FileKind][] = [['claims.bib', 'bibtex'], ['claims.tex', 'latex'], ['claims.md', 'markdown']];
+    const files: [string, FileKind][] = [['claims.bib', 'bibtex'], ['claims.tex', 'latex'], ['claims.md', 'markdown'], ['agency.bib', 'bibtex']];
     for (const [name, kind] of files) {
       await checkText(name, fixtureFile(name), kind, { crossref, pro: true });
     }
