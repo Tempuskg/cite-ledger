@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.1 (2026-10-26)
+
+Each change below is backed by the named tests. The claim register is unchanged.
+
+Checks:
+
+- A DOI that is not in Crossref but is registered with another agency, such as DataCite (arXiv and Zenodo DOIs, for example), is now reported as an info finding that names the agency, not as a "does not resolve in Crossref" warning. Cite Ledger asks Crossref's agency lookup (`api.crossref.org/works/{doi}/agency`), so no new host is contacted. When no agency is found, or the lookup fails, the P1 warning is reported as before. The new finding kind is `other-agency`; the summary line and reports count it apart from "DOI not found", and `--fail-on other-agency` selects it. (P1, L1; `test/claims.test.ts`, "DOIs registered outside Crossref (L1)"; `test/summary.test.ts` and `test/report.test.ts`, counted apart from DOI not found; `test/network.test.ts`, P5; `test-live/crossref-live.test.ts`)
+- An entry with no DOI that is an arXiv preprint (`eprint` with `archivePrefix = {arXiv}` or `eprinttype = {arxiv}` in a `.bib` file, or `arXiv:NNNN.NNNNN` in `journal`, `note`, a `thebibliography` item or a Markdown reference) is still searched in Crossref, so a published version can be found. When nothing matches, the unverified message now says the entry is an arXiv preprint whose DOI is registered with DataCite, which Cite Ledger does not check, and links to the arXiv DOI on doi.org. No new request is sent. (P4, L1, L3; `test/claims.test.ts`, "arXiv preprints without a DOI (L1)"; `test/parsers.test.ts`, arXiv identifiers)
+
+Docs:
+
+- The L1 paragraph in [docs/limits.md](docs/limits.md#l1) describes the agency lookup. The L1 claim text is unchanged.
+
 ## 0.1.0 (2026-10-25)
 
 First version. Each claim below is in the [claim register](docs/claim-register.md) and backed by the named test.

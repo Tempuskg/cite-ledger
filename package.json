@@ -2,7 +2,7 @@
   "name": "cite-ledger",
   "displayName": "Cite Ledger — Citation & Retraction Checker",
   "description": "Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "darrenjmcleod",
   "license": "MIT",
   "icon": "media/icon.png",
