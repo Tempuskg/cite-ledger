@@ -79,6 +79,14 @@
     </ul>
     <p>Pro costs USD $12, as listed on the <a href="https://buy.polar.sh/polar_cl_sTahdpEXRlwOfOi2HwXgYerl2LRAoQTpoGNr909TkK1">Polar product page</a> (&quot;This is a one-time charge&quot;).</p>
 
+    <h2>Changelog — 0.1.1</h2>
+    <p>Released 2026-10-26. Two checks changed. The claim register is unchanged.</p>
+    <ul>
+      <li>A DOI that is not in Crossref but is registered with another agency, such as DataCite, is now reported as an info finding that names the agency, not as a warning. When no agency is found, or the agency lookup fails, the P1 warning is reported as before. Claims: <span data-claim="P1">Flags references whose DOI does not resolve in Crossref.</span><span class="tag">P1</span> <span data-claim="L1">Does not check DOIs registered outside Crossref, for example DataCite.</span><span class="tag">L1</span></li>
+      <li>An arXiv preprint with no DOI is still searched in Crossref, so a published version can be found. When nothing matches, the unverified message now says the entry is an arXiv preprint whose DOI is registered with DataCite, and links to the arXiv DOI on doi.org. Claims: <span data-claim="P4">Marks references with no matching Crossref record as unverified.</span><span class="tag">P4</span> <span data-claim="L1">Does not check DOIs registered outside Crossref, for example DataCite.</span><span class="tag">L1</span> <span data-claim="L3">&#39;Unverified&#39; means no matching record was found, not that the reference is fabricated.</span><span class="tag">L3</span></li>
+    </ul>
+    <p>Claims in this entry match the <a href="https://github.com/Tempuskg/cite-ledger/blob/v0.1.1/docs/claim-register.md">claim register</a>. The tests named in the <a href="https://github.com/Tempuskg/cite-ledger/blob/v0.1.1/CHANGELOG.md">CHANGELOG</a> passed on the released tag in <a href="https://github.com/Tempuskg/cite-ledger/actions/runs/40447678305">Release run 40447678305</a>.</p>
+
     <h2>Changelog — 0.1.0</h2>
     <p>First public release (2026-10-25). Reference-list checks for unresolved DOIs, retractions/corrections/expressions of concern, metadata mismatches and unverified entries, with evidence links and limits L1–L3. Free single-file checks; Pro adds workspace scan, CLI/CI exit codes, exportable reports and closest-match suggestions.</p>
     <p>Claims on this page and in the listings match the <a href="https://github.com/Tempuskg/cite-ledger/blob/v0.1.0/docs/claim-register.md">claim register</a>. The tests named there passed on the released tag in <a href="https://github.com/Tempuskg/cite-ledger/actions/runs/40192727110">Release run 40192727110</a>. Full notes: <a href="https://github.com/Tempuskg/cite-ledger/blob/v0.1.0/CHANGELOG.md">CHANGELOG</a>.</p>
