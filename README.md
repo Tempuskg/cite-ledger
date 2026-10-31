@@ -46,7 +46,7 @@ Settings:
 - `citeLedger.mailto`: your email address for Crossref's polite pool. It is sent to Crossref with each lookup, as Crossref asks, and nowhere else.
 - `citeLedger.checkOnSave`: check a reference file each time you save it. Off by default.
 
-In a `.tex` file, Cite Ledger reads `thebibliography` lists. When the file uses `\bibliography{...}` or `\addbibresource{...}`, open the `.bib` file and check it there. In Markdown, it reads the section under a heading such as "References", "Bibliography" or "Works cited". A DOI elsewhere in the text is checked for retractions and whether it resolves, but not compared with the surrounding prose.
+In a `.tex` file, Cite Ledger reads `thebibliography` lists. When the file uses `\bibliography{...}` or `\addbibresource{...}`, it also checks the `.bib` files named there, found relative to the `.tex` file, and shows their findings on the `.bib` file's own lines. A named file that is not found gets a note. In Markdown, it reads the section under a heading such as "References", "Bibliography" or "Works cited". A DOI elsewhere in the text is checked for retractions and whether it resolves, but not compared with the surrounding prose.
 
 ## Using the command line
 

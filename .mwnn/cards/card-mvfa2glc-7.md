@@ -1,11 +1,11 @@
 ---
 id: card-mvfa2glc-7
 title: First weekly operations run after launch
-column: col-mvfa2glc-3
-position: 1000
+column: col-mvfa2glc-5
+position: -7000
 assignee: { kind: ai }
 createdAt: 1792415841150
-updatedAt: 1792979100000
+updatedAt: 1792979263932
 dependsOn: [card-mvfa2glc-6]
 ---
 

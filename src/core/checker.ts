@@ -315,9 +315,53 @@ export async function checkEntries(entries: readonly ReferenceEntry[], options: 
   return Promise.all(entries.map((entry) => checkEntry(entry, options)));
 }
 
+/** Checks one file's own references. The .bib files a .tex file names get a note saying to check them there. */
 export async function checkText(file: string, text: string, kind: FileKind, options: CheckOptions): Promise<FileReport> {
   const parsed = parseReferences(text, kind);
-  return { file, kind, results: await checkEntries(parsed.entries, options), notes: parsed.notes };
+  const notes = [...parsed.notes, ...(parsed.bibFiles ?? []).map((name) => `References for this file are in ${name}. Open ${name} and check it there.`)];
+  return { file, kind, results: await checkEntries(parsed.entries, options), notes };
+}
+
+/** How the CLI or the extension reads the files a checked file names. */
+export interface LinkedFiles {
+  /** The path of `name`, written in `from`, relative to `from`'s folder. */
+  readonly resolve: (from: string, name: string) => string;
+  /** The file's text, or undefined when it does not exist. */
+  readonly read: (file: string) => Promise<string | undefined>;
+  /** Files already checked in this run, as `key` gives them. They are not checked again, and each file checked is added. */
+  readonly checked?: Set<string>;
+  readonly key?: (file: string) => string;
+}
+
+/**
+ * Checks a file and each .bib file it names (a .tex file's \bibliography or \addbibresource),
+ * giving one report per file so findings sit on each file's own lines. A named file that does
+ * not exist gets a note, not a finding. Returns no reports when `file` was already checked.
+ */
+export async function checkWithLinkedFiles(file: string, text: string, kind: FileKind, options: CheckOptions, linked: LinkedFiles): Promise<FileReport[]> {
+  const key = linked.key ?? ((name: string) => name);
+  const checked = linked.checked ?? new Set<string>();
+  if (checked.has(key(file))) {
+    return [];
+  }
+  checked.add(key(file));
+  const parsed = parseReferences(text, kind);
+  const notes = [...parsed.notes];
+  const reports: FileReport[] = [];
+  for (const name of parsed.bibFiles ?? []) {
+    const target = linked.resolve(file, name);
+    if (checked.has(key(target))) {
+      continue;
+    }
+    const bibText = await linked.read(target);
+    if (bibText === undefined) {
+      notes.push(`References for this file are in ${name}, which was not found. It was not checked.`);
+      continue;
+    }
+    checked.add(key(target));
+    reports.push(await checkText(target, bibText, 'bibtex', options));
+  }
+  return [{ file, kind, results: await checkEntries(parsed.entries, options), notes }, ...reports];
 }
 
 export function findingsOf(report: FileReport): Finding[] {

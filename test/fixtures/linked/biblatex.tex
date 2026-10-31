@@ -1,0 +1,10 @@
+\documentclass{article}
+\usepackage{biblatex}
+\addbibresource{main.bib}
+\addbibresource[label=extra]{refs/extra.bib}
+%\addbibresource{commented.bib}
+\addbibresource[location=remote]{https://example.org/remote.bib}
+\begin{document}
+Text citing \cite{placeholder_unregistered}.
+\printbibliography
+\end{document}

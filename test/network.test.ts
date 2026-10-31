@@ -7,7 +7,7 @@ import { main } from '../src/cli';
 import { checkText } from '../src/core/checker';
 import { createCrossrefClient } from '../src/core/crossref';
 import type { FileKind } from '../src/core/types';
-import { FILES, fixtureFetch, fixtureFile, type RecordedRequest } from './helpers';
+import { FILES, FIXTURES, fixtureFetch, fixtureFile, type RecordedRequest } from './helpers';
 
 /**
  * P5: "Runs on your machine and sends only the reference details it looks up to Crossref."
@@ -59,6 +59,17 @@ describe('P5 network', () => {
     assert.equal(code, 0);
     assert.ok(recorded.length > 0);
     assert.deepEqual([...new Set(recorded.map((request) => new URL(request.url).hostname))], ['api.crossref.org']);
+    assert.deepEqual(blocked, []);
+  });
+
+  test('P5: checking a .tex file reads the .bib files it names from disk and calls only api.crossref.org', async () => {
+    recorded.length = 0;
+    const output: string[] = [];
+    const code = await main(['check', path.join(FIXTURES, 'linked', 'paper.tex')], { env: {}, stdout: (text) => output.push(text), stderr: (text) => output.push(text), crossrefMinIntervalMs: 0 });
+    assert.equal(code, 0);
+    assert.match(output.join(''), /Checked 2 references in 3 file\(s\)/);
+    assert.deepEqual([...new Set(recorded.map((request) => new URL(request.url).hostname))], ['api.crossref.org']);
+    assert.ok(recorded.every((request) => request.method === 'GET' && request.body === undefined));
     assert.deepEqual(blocked, []);
   });
 });

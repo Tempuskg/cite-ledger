@@ -1,5 +1,6 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
-import { checkText } from './core/checker';
+import { checkText, checkWithLinkedFiles } from './core/checker';
 import { createCrossrefClient, type CrossrefClient } from './core/crossref';
 import { validateLicenseKey } from './core/license';
 import { LIMITS, LIMITS_URL, limitsLine } from './core/limits';
@@ -28,6 +29,22 @@ const SEVERITY: Readonly<Record<Severity, vscode.DiagnosticSeverity>> = {
   warning: vscode.DiagnosticSeverity.Warning,
   info: vscode.DiagnosticSeverity.Information,
 };
+
+/** Identifies a file, so a scan checks each file once whichever way it is reached. */
+function fileKey(file: string): string {
+  return process.platform === 'win32' ? file.toLowerCase() : file;
+}
+
+/** The text of a file a checked file names, such as a .tex file's .bib, including unsaved edits. */
+async function readLinked(file: string): Promise<string | undefined> {
+  const uri = vscode.Uri.file(file);
+  try {
+    await vscode.workspace.fs.stat(uri);
+  } catch {
+    return undefined;
+  }
+  return (await vscode.workspace.openTextDocument(uri)).getText();
+}
 
 function toDiagnostic(document: vscode.TextDocument | undefined, finding: Finding): vscode.Diagnostic {
   const endLine = document ? Math.min(finding.endLine, document.lineCount - 1) : finding.endLine;
@@ -91,15 +108,34 @@ export function activate(context: vscode.ExtensionContext): void {
     return false;
   }
 
-  async function checkDocument(document: vscode.TextDocument, client: CrossrefClient, pro: boolean): Promise<FileReport | undefined> {
-    const kind = kindForFile(document.fileName);
-    if (!kind) {
-      return undefined;
-    }
-    const report = await checkText(vscode.workspace.asRelativePath(document.uri), document.getText(), kind, { crossref: client, pro });
+  function publish(document: vscode.TextDocument, report: FileReport): FileReport {
     lastReports.set(document.uri.toString(), report);
     diagnostics.set(document.uri, report.results.flatMap((result) => result.findings.map((finding) => toDiagnostic(document, finding))));
     return report;
+  }
+
+  /**
+   * Checks a document and, for a .tex file on disk, each .bib file it names. Findings go on each
+   * file's own lines. Files in `checked` are skipped, so a workspace scan checks each file once.
+   */
+  async function checkDocument(document: vscode.TextDocument, client: CrossrefClient, pro: boolean, checked?: Set<string>): Promise<FileReport[]> {
+    const kind = kindForFile(document.fileName);
+    if (!kind) {
+      return [];
+    }
+    if (document.uri.scheme !== 'file') {
+      return [publish(document, await checkText(vscode.workspace.asRelativePath(document.uri), document.getText(), kind, { crossref: client, pro }))];
+    }
+    const reports = await checkWithLinkedFiles(document.uri.fsPath, document.getText(), kind, { crossref: client, pro }, {
+      resolve: (from, name) => path.resolve(path.dirname(from), name),
+      read: readLinked,
+      key: fileKey,
+      ...(checked ? { checked } : {}),
+    });
+    return Promise.all(reports.map(async (report) => {
+      const target = report.file === document.uri.fsPath ? document : await vscode.workspace.openTextDocument(vscode.Uri.file(report.file));
+      return publish(target, { ...report, file: vscode.workspace.asRelativePath(target.uri) });
+    }));
   }
 
   /** Logs the run, then shows its result with buttons that lead to the findings. */
@@ -129,12 +165,12 @@ export function activate(context: vscode.ExtensionContext): void {
       return;
     }
     const pro = await licensed();
-    const report = await vscode.window.withProgress(
+    const reports = await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Notification, title: 'Cite Ledger: checking references against Crossref' },
       () => checkDocument(target, crossref(), pro),
     );
-    if (report) {
-      void showResult([report], target);
+    if (reports.length > 0) {
+      void showResult(reports, target);
     }
   }
 
@@ -149,6 +185,7 @@ export function activate(context: vscode.ExtensionContext): void {
       const uris = await vscode.workspace.findFiles(REFERENCE_GLOB, '**/{node_modules,.git,dist,out}/**', MAX_WORKSPACE_FILES);
       const client = crossref();
       const reports: FileReport[] = [];
+      const checked = new Set<string>();
       await vscode.window.withProgress(
         { location: vscode.ProgressLocation.Notification, title: 'Cite Ledger: checking workspace references', cancellable: true },
         async (progress, token) => {
@@ -157,10 +194,8 @@ export function activate(context: vscode.ExtensionContext): void {
               break;
             }
             progress.report({ message: vscode.workspace.asRelativePath(uri), increment: 100 / uris.length });
-            const report = await checkDocument(await vscode.workspace.openTextDocument(uri), client, true);
-            if (report && report.results.length > 0) {
-              reports.push(report);
-            }
+            const checkedReports = await checkDocument(await vscode.workspace.openTextDocument(uri), client, true, checked);
+            reports.push(...checkedReports.filter((report) => report.results.length > 0));
           }
         },
       );

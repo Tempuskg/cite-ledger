@@ -6,3 +6,4 @@ dist-test/
 !.vscode/launch.json
 !.vscode/tasks.json
 .chat/
+.measure/

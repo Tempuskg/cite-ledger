@@ -41,13 +41,14 @@ describe('BibTeX parser', () => {
 
 describe('LaTeX parser', () => {
   test('reads thebibliography items, \\doi and ignores comments', () => {
-    const { entries, notes } = parseLatex(fixtureFile('claims.tex'));
+    const { entries, notes, bibFiles } = parseLatex(fixtureFile('claims.tex'));
     assert.deepEqual(entries.map((entry) => entry.id), ['wakefield', 'lecun', 'fake']);
     assert.equal(entries[0].doi, '10.1016/s0140-6736(97)11096-0');
     assert.equal(entries[1].doi, undefined);
     assert.equal(entries[0].startLine, 4);
     assert.match(entries[1].rawText, /Deep learning/);
-    assert.equal(notes.length, 1);
+    assert.deepEqual(notes, []);
+    assert.deepEqual(bibFiles, ['extra.bib']);
   });
 });
 

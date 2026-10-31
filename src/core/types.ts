@@ -30,6 +30,11 @@ export interface ParseResult {
   readonly entries: ReferenceEntry[];
   /** Informational notes, such as "references are in refs.bib". No network is involved. */
   readonly notes: string[];
+  /**
+   * The .bib files the file names (a .tex file's `\bibliography` or `\addbibresource`), relative to
+   * the file and with the .bib extension. Parsers never read files: the caller reads and checks these.
+   */
+  readonly bibFiles?: readonly string[];
 }
 
 export type FindingKind =

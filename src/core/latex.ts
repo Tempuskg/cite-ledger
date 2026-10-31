@@ -52,12 +52,19 @@ export function parseLatex(text: string): ParseResult {
     });
   }
 
+  const bibFiles: string[] = [];
   for (const match of source.matchAll(/\\(?:bibliography|addbibresource)\s*(?:\[[^\]]*\])?\s*\{([^}]*)\}/g)) {
     for (const name of match[1].split(',').map((part) => part.trim()).filter(Boolean)) {
+      if (/^[a-z][a-z0-9+.-]*:\/\//i.test(name)) {
+        notes.push(`References for this file are at ${name}. Cite Ledger reads only local files, so they were not checked.`);
+        continue;
+      }
       const file = /\.bib$/i.test(name) ? name : `${name}.bib`;
-      notes.push(`References for this file are in ${file}. Open ${file} and check it there.`);
+      if (!bibFiles.includes(file)) {
+        bibFiles.push(file);
+      }
     }
   }
 
-  return { entries, notes };
+  return { entries, notes, bibFiles };
 }

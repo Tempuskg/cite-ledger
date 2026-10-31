@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { checkText } from './core/checker';
+import { checkWithLinkedFiles, type LinkedFiles } from './core/checker';
 import { createCrossrefClient, type Fetch } from './core/crossref';
 import { validateLicenseKey } from './core/license';
 import { LIMITS, LIMITS_URL } from './core/limits';
@@ -122,6 +122,23 @@ async function collectFiles(target: string, found: string[]): Promise<void> {
   }
 }
 
+/** Identifies a file, so a scan checks each file once whichever way it is reached. */
+function fileKey(file: string): string {
+  const resolved = path.resolve(file);
+  return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+}
+
+async function readIfExists(file: string): Promise<string | undefined> {
+  try {
+    return await fs.readFile(file, 'utf8');
+  } catch (error) {
+    if (['ENOENT', 'ENOTDIR'].includes((error as NodeJS.ErrnoException).code ?? '')) {
+      return undefined;
+    }
+    throw error;
+  }
+}
+
 function formatFinding(file: string, finding: Finding): string {
   const tag = finding.claim ? `${finding.claim} ${finding.kind}` : finding.kind;
   return [
@@ -215,13 +232,14 @@ export async function main(argv: readonly string[], deps: CliDeps = {}): Promise
       ...(deps.crossrefMinIntervalMs !== undefined ? { minIntervalMs: deps.crossrefMinIntervalMs } : {}),
     });
     const reports: FileReport[] = [];
+    const linked: LinkedFiles = { resolve: (from, name) => path.join(path.dirname(from), name), read: readIfExists, checked: new Set(), key: fileKey };
     for (const file of files) {
       const kind = kindForFile(file);
       if (!kind) {
         continue;
       }
       const text = await fs.readFile(file, 'utf8');
-      reports.push(await checkText(file, text, kind, { crossref, pro: licensed }));
+      reports.push(...await checkWithLinkedFiles(file, text, kind, { crossref, pro: licensed }, linked));
     }
 
     const findings = reports.flatMap((report) => report.results.flatMap((result) => result.findings.map((finding) => ({ file: report.file, finding }))));

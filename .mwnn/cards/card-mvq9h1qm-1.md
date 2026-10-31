@@ -1,11 +1,11 @@
 ---
 id: card-mvq9h1qm-1
 title: Publish the 0.1.1 changelog entry on the product page
-column: col-mvfa2glc-3
-position: 1000
+column: col-mvfa2glc-5
+position: -14000
 assignee: { kind: ai }
 createdAt: 1793099500358
-updatedAt: 1793450622887
+updatedAt: 1793456503101
 dependsOn: [card-mvq266pd-4]
 ---
 
@@ -19,10 +19,10 @@ Steps:
 4. Run `npm run check`, then commit and push to `main`.
 
 ## Acceptance criteria
-- [ ] The pre-publish check (instruction in force and unexpired, 06:00–21:00 America/Regina, 1 changelog entry for this release) is recorded in Activity before publishing.
-- [ ] `site/index.html` has a 0.1.1 T2 entry that uses only accepted claims, and `npm run check:claims` passes.
-- [ ] `docs/publication-log.md` has a row for it.
-- [ ] `npm run check` passes, and the change is pushed to `main`.
+- [x] The pre-publish check (instruction in force and unexpired, 06:00–21:00 America/Regina, 1 changelog entry for this release) is recorded in Activity before publishing.
+- [x] `site/index.html` has a 0.1.1 T2 entry that uses only accepted claims, and `npm run check:claims` passes.
+- [x] `docs/publication-log.md` has a row for it.
+- [x] `npm run check` passes, and the change is pushed to `main`.
 
 ## Activity
 ### 2026-10-31T12:43:40.944Z - Usage Orchestrator chose Anthropic Claude Code CLI
@@ -47,3 +47,16 @@ Actual model: "claude-opus-5-5" (source: Claude Code stream-json system.init.mod
 - **Volume.** This is 1 changelog entry for this release. `docs/publication-log.md` has no earlier 0.1.1 entry.
 - **Release approved.** Darren approved v0.1.1 on 2026-10-26. Release run 40447678305 on `v0.1.1` concluded `success`.
 - **Stop conditions.** None applies. The weekly log on `card-mvfa2glc-7` reports 0 open issues and no wrong-finding stop, and it is within its 14-day acknowledgement window.
+
+### 2026-10-31T12:50:00Z - Published 0.1.1 T2 changelog entry (Claude Code)
+- **Product page.** `site/index.html` has a new "Changelog — 0.1.1" section above the 0.1.0 one. It gives the date (2026-10-26) and says the claim register is unchanged. It describes the two `CHANGELOG.md` 0.1.1 changes: DOIs registered with another agency are reported as an info finding that names the agency, and arXiv preprints without a DOI get the new unverified message. The claims appear word for word as tagged `data-claim` spans: P1 and L1, then P4, L1 and L3. It links the `v0.1.1` claim register, the `v0.1.1` CHANGELOG (which names the tests) and Release run 40447678305.
+- **Log.** `docs/publication-log.md` has a row dated 2026-10-31 06:47 America/Regina: product-page channel, T2, P1/P4/L1/L3, sources, and the §8 authority with the pre-publish check.
+- **Checks.** `npm run check:claims` passed. `npm run check` passed with exit 0 (58 tests pass, 0 fail; the VSIX packaged). It ran in a clean worktree at HEAD with only these changes, because the main checkout holds unrelated uncommitted work from other cards. That work was not touched or committed.
+- **Pushed.** Commit `5d5380b` is on `main`. The Product page workflow deploys on merge.
+
+STATUS: DONE
+
+### 2026-10-31T12:46:46.188Z - MWNN independent verification started
+
+### 2026-10-31T12:46:46.259Z - Anthropic Claude Code CLI implementation handoff failed
+Missing or invalid verification inputs. Configure .mwnn/verification.json, with a check mapping for every acceptance criterion, before dispatch.

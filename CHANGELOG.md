@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+Each change below is backed by the named tests. The claim register is unchanged.
+
+Checks:
+
+- Checking a `.tex` file now also checks the `.bib` files it names with `\bibliography{...}` (for example `\bibliography{main,refs/extra}`) or `\addbibresource{...}` (for example `\addbibresource{refs/extra.bib}`). Each file is found relative to the `.tex` file, and its findings are reported on that `.bib` file's own lines: in the Problems panel, in CLI output and in reports. Commented-out commands are ignored. A named file that is not found gets a note, not an error, and a remote `\addbibresource` URL is not fetched. This is part of the free single-file check. A Pro workspace scan checks each `.bib` file once, whether it is reached directly or through a `.tex` file. The files are read locally, and lookups still go only to `api.crossref.org`. (P7; `test/linked.test.ts`; `test/parsers.test.ts`; `test/network.test.ts`, P5)
+
+Docs:
+
+- The README paragraph under "Using it in the editor" no longer says to open the `.bib` file and check it there.
+
 ## 0.1.1 (2026-10-26)
 
 Each change below is backed by the named tests. The claim register is unchanged.

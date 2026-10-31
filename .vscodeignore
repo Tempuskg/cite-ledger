@@ -18,3 +18,4 @@ esbuild.mjs
 eslint.config.mjs
 **/*.map
 *.vsix
+.measure/**
