@@ -24,10 +24,10 @@ Escalations follow AGENTS.md. Anything involving money, licences or personal dat
 At the end of the run, create next week's operations card in this board's Backlog. Its description and criteria are the same, and it has no `dependsOn`.
 
 ## Acceptance criteria
-- [ ] The standing instruction was confirmed in force and unexpired before anything was published.
-- [ ] Every item published is in `docs/publication-log.md`, within the volume limits.
-- [ ] The weekly log, with any escalations, is written for Darren's review.
-- [ ] Next week's operations card exists.
+- [x] The standing instruction was confirmed in force and unexpired before anything was published.
+- [x] Every item published is in `docs/publication-log.md`, within the volume limits.
+- [x] The weekly log, with any escalations, is written for Darren's review.
+- [x] Next week's operations card exists.
 
 ## Activity
 ### 2026-11-07T23:08:48.795Z - AI-guided interview started in Claude Code
@@ -65,3 +65,42 @@ A: "BibTeX unresolved DOIs (Recommended)". Reported by Darren McLeod in intervie
 Q: "May I publish it now?" (the T1 article, by committing and pushing to `main`).
 A: "Yes, publish". Reported by Darren McLeod in interview chat, 2026-11-07. User-reported.
 Pre-publish check (verified evidence), 2026-11-07 17:58 America/Regina: §8 of `plans/autonomous-profit-project-research-2026-10-19.md` still shows the 2026-10-19 acceptance and 2027-01-17 expiry, with no "Revoked" status line and no uncommitted change to the file. Inside 06:00–21:00. 0 prior T1 this week and this month. Row added to `docs/publication-log.md`.
+
+### 2026-11-08T00:10:00Z - Published, deployed and logged (verified evidence)
+Commit `9cc90ba` pushed to `main` at 2026-11-07 17:58 America/Regina. CI run [42427616487](https://github.com/Tempuskg/cite-ledger/actions/runs/42427616487) and Product page run [42427616442](https://github.com/Tempuskg/cite-ledger/actions/runs/42427616442) both succeeded. https://tempuskg.github.io/cite-ledger/articles/how-to-check-bibtex-references-for-unresolved-dois.html returns HTTP 200.
+
+### 2026-11-08T00:12:00Z - Weekly log for Darren (week of 2026-11-01 to 2026-11-07)
+**Standing instruction.** In force, accepted 2026-10-19, expires 2027-01-17, not revoked. Checked at 17:09 and again at 17:58 America/Regina, right before publishing (verified evidence).
+
+**Crossref live.** Workflow active. Scheduled run [41461586815](https://github.com/Tempuskg/cite-ledger/actions/runs/41461586815) on 2026-11-02 succeeded. No re-enable needed.
+
+**Issue triage.** No issues, open or closed, and no pull requests. Nothing labelled. No wrong-finding report.
+
+**Discussions.** 0 threads. 0 replies, out of a limit of 10 a week.
+
+**Published this run (all in `docs/publication-log.md`):**
+1. T1 article "How to check BibTeX references for unresolved DOIs", with an index link. 1 of 1 this week, 1 of 4 in November. Claims P1, P2, P5, P6, L1–L3.
+
+**Drafts waiting for Darren.** None.
+
+**Escalations.**
+- Product board: `card-mw72euz3-1`, "Keep authors of retracted works out of first-author findings" (Backlog). When the retracted example DOI was checked with a placeholder author, the 0.1.1 `first-author-differs` finding printed the Crossref first author's surname. That conflicts with AGENTS.md rule 4. The published articles don't quote it. A fix needs a release, which is your approval.
+- Company board: none. Nothing involved money, licences or personal data.
+
+**Stop conditions.** None apply. Your acknowledgement of the previous log was recorded on `card-mvfa2glc-7` today.
+
+**Waiting on Darren.**
+- Acknowledge this log here within 14 days, by 2026-11-21 (stop condition 5).
+- Renew or end the standing instruction by 2027-01-17 (`card-mvfa7k2p-2`, company board).
+
+**Next week.** `card-mw72euz3-2`, "Weekly operations run - Nov 8", is in Backlog. It has the same description and criteria, no `dependsOn`, and the same assignee as this card (human).
+
+### 2026-11-08T00:14:00Z - Closing summary
+All four acceptance criteria are met, each by the verified evidence above.
+- **Instruction confirmed before publishing:** yes, checked at 17:58 America/Regina before the 17:58 push.
+- **Every item published is in the log, within the limits:** yes, 1 T1 article.
+- **Weekly log written:** yes, in the entry above.
+- **Next week's card:** `card-mw72euz3-2` is in Backlog.
+
+The previous-log acknowledgement, the topic choice and the go-ahead to publish are user-reported. No unresolved exceptions. This card's column and assignee were not changed; moving it is left to the board's column rules.
+STATUS: DONE
