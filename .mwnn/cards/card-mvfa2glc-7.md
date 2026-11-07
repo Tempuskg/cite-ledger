@@ -56,3 +56,7 @@ Dispatched this card to GitHub Copilot. The agent should append its completion n
 **Next week.** Backlog card `card-mvolel0t-1` created (same description/criteria; no `dependsOn`).
 
 STATUS: DONE
+
+### 2026-11-07T23:15:00Z - Weekly log acknowledged by Darren
+Q: "Do you acknowledge that log now, so I can record it on that card?"
+A: "Yes, acknowledge it". Reported by Darren McLeod in the interview chat for `card-mvolel0t-1`, 2026-11-07 (17:15 America/Regina). User-reported. This resets the 14-day window in stop condition 5. The card's status is unchanged.

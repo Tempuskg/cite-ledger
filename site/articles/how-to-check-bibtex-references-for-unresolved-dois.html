@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to check BibTeX references for unresolved DOIs — Cite Ledger</title>
+  <meta name="description" content="A worked example of checking a .bib file for DOIs that do not resolve in Crossref.">
+  <style>
+    :root {
+      --bg: #fbfaf7;
+      --fg: #1d2421;
+      --muted: #55615c;
+      --rule: #d9ddd8;
+      --accent: #1f6f5c;
+      --panel: #f0f2ee;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141917;
+        --fg: #e6ebe8;
+        --muted: #a3b0aa;
+        --rule: #2d3632;
+        --accent: #6cc4a8;
+        --panel: #1c2320;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 17px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 44rem; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+    h1 { font-size: 2rem; line-height: 1.25; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.25rem; margin: 2.5rem 0 0.75rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+    p.lead { color: var(--muted); font-size: 1.05rem; margin-top: 0; }
+    a { color: var(--accent); }
+    ul, ol { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+    .tag { color: var(--muted); font-size: 0.8rem; margin-left: 0.25rem; }
+    .note { background: var(--panel); border-left: 3px solid var(--accent); padding: 0.75rem 1rem; }
+    code { background: var(--panel); padding: 0.1rem 0.3rem; border-radius: 3px; }
+    pre {
+      background: var(--panel);
+      padding: 0.9rem 1rem;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    footer { margin-top: 3rem; color: var(--muted); font-size: 0.9rem; }
+    .crumb { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.25rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="crumb"><a href="../index.html">Cite Ledger</a> · Article</p>
+    <h1>How to check BibTeX references for unresolved DOIs</h1>
+    <p class="lead">A free single-file check against Crossref, with a worked example in which one mistyped character hides a public retraction notice.</p>
+
+    <p>DOIs are often copied from formatted pages, and Crossref has written about how hard it is to tell where a DOI ends in such text: "Is the period at the end of the line part of the DOI or part of the design?" (<a href="https://www.crossref.org/blog/dois-and-matching-regular-expressions/">Crossref, 2015-08-11</a>). A DOI in a <code>.bib</code> file that gained or lost a character points at nothing, and every check that keys on it, including a retraction check, then has nothing to look up.</p>
+
+    <h2>Worked example</h2>
+    <p>Take these BibTeX entries. The first two are meant to cite the same work, a real Crossref work with a retraction recorded in Crossref (via Retraction Watch); the first has dropped one digit from its DOI. The third is a preprint whose DOI is registered with DataCite. Author and title fields are placeholders on purpose; the check keys on the DOI.</p>
+<pre><code>@article{typo1998,
+  author  = {Example, A.},
+  title   = {An example entry for a DOI check},
+  journal = {Example Journal},
+  year    = {1998},
+  doi     = {10.1016/S0140-6736(97)1109-0}
+}
+
+@article{fixed1998,
+  author  = {Example, A.},
+  title   = {An example entry for a DOI check},
+  journal = {Example Journal},
+  year    = {1998},
+  doi     = {10.1016/S0140-6736(97)11096-0}
+}
+
+@misc{preprint2017,
+  title = {An example preprint entry},
+  year  = {2017},
+  doi   = {10.48550/arXiv.1706.03762}
+}</code></pre>
+    <p>Cite Ledger 0.1.1 reports these findings, among others:</p>
+<pre><code>refs.bib:1 typo1998 [P1 doi-not-found] DOI 10.1016/s0140-6736(97)1109-0 does not resolve in Crossref.
+refs.bib:9 fixed1998 [P2 retraction] Retraction recorded in Crossref for 10.1016/s0140-6736(97)11096-0 (2010-02-06): notice 10.1016/s0140-6736(10)60175-4. Recorded by Retraction Watch.
+refs.bib:17 preprint2017 [P1 other-agency] DOI 10.48550/arxiv.1706.03762 is registered with DataCite, not Crossref. Cite Ledger does not check DOIs registered outside Crossref (L1).</code></pre>
+    <ul>
+      <li><strong>The mistyped DOI</strong> has no record in Crossref and no registration agency, so it is flagged as not resolving. The finding links to <code>api.crossref.org</code> and <code>doi.org</code>, so you can see for yourself. Nothing else can be checked for that entry, so the retraction stays hidden until the DOI is fixed.</li>
+      <li><strong>The corrected DOI</strong> is the public Crossref record <a href="https://doi.org/10.1016/s0140-6736(97)11096-0">10.1016/s0140-6736(97)11096-0</a>. Its retraction notice is <a href="https://doi.org/10.1016/s0140-6736(10)60175-4">10.1016/s0140-6736(10)60175-4</a>, dated 2010-02-06 in the Crossref metadata. Crossref also records a correction for it. Because the example uses placeholder author and title fields, this entry also gets title and first-author differences; your real entries should not.</li>
+      <li><strong>The DataCite DOI</strong> is not in Crossref, so Cite Ledger names the agency that registered it instead of calling it unresolved, and does not check the work further.</li>
+    </ul>
+
+    <h2>Steps (free tier)</h2>
+    <ol>
+      <li>Install Cite Ledger from the <a href="https://marketplace.visualstudio.com/items?itemName=darrenjmcleod.cite-ledger">VS Code Marketplace</a> or <a href="https://open-vsx.org/extension/darrenjmcleod/cite-ledger">Open VSX</a>.</li>
+      <li>Open your <code>.bib</code> file.</li>
+      <li>Run <strong>Cite Ledger: Check References in This File</strong> from the Command Palette (or use the checklist button in the editor title bar).</li>
+      <li>Open the Problems panel. For each DOI that does not resolve, open its <code>doi.org</code> link, compare the DOI with the publisher's page, fix the entry and check the file again.</li>
+    </ol>
+    <p><span data-claim="P6">Single-file checks are free; Pro is a one-time licence.</span><span class="tag">P6</span></p>
+    <ul>
+      <li><span data-claim="P1">Flags references whose DOI does not resolve in Crossref.</span><span class="tag">P1</span></li>
+      <li><span data-claim="P2">Flags retractions, corrections and expressions of concern recorded in Crossref, including Retraction Watch data.</span><span class="tag">P2</span></li>
+      <li><span data-claim="P5">Runs on your machine and sends only the reference details it looks up to Crossref.</span><span class="tag">P5</span></li>
+    </ul>
+
+    <h2>Limits</h2>
+    <ul>
+      <li><span data-claim="L1">Does not check DOIs registered outside Crossref, for example DataCite.</span><span class="tag">L1</span></li>
+      <li><span data-claim="L2">Crossref&#39;s retraction data can miss some retractions.</span><span class="tag">L2</span></li>
+      <li><span data-claim="L3">&#39;Unverified&#39; means no matching record was found, not that the reference is fabricated.</span><span class="tag">L3</span></li>
+    </ul>
+    <p>A DOI that does not resolve in Crossref may still be valid with an agency Crossref could not name, or the lookup may have failed; the <code>doi.org</code> link shows whether it resolves anywhere. More detail: <a href="https://github.com/Tempuskg/cite-ledger/blob/main/docs/limits.md">limits</a>.</p>
+
+    <h2>Found a wrong finding?</h2>
+    <p>Please <a href="https://github.com/Tempuskg/cite-ledger/issues/new?template=wrong-finding.yml">report it</a>. A wrong finding is a defect.</p>
+
+    <p class="note">Drafted with AI assistance and checked against the linked sources.</p>
+
+    <footer>
+      <p><a href="../index.html">Cite Ledger</a> · Sources: <a href="https://www.crossref.org/blog/dois-and-matching-regular-expressions/">Crossref blog, 2015-08-11</a>; DOI <a href="https://doi.org/10.1016/s0140-6736(97)11096-0">10.1016/s0140-6736(97)11096-0</a>; retraction notice <a href="https://doi.org/10.1016/s0140-6736(10)60175-4">10.1016/s0140-6736(10)60175-4</a>; DataCite DOI <a href="https://doi.org/10.48550/arXiv.1706.03762">10.48550/arXiv.1706.03762</a>.</p>
+    </footer>
+  </main>
+</body>
+</html>
