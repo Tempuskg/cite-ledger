@@ -66,10 +66,10 @@ Q: "May I publish it now?" (the T1 article, by committing and pushing to `main`)
 A: "Yes, publish". Reported by Darren McLeod in interview chat, 2026-11-07. User-reported.
 Pre-publish check (verified evidence), 2026-11-07 17:58 America/Regina: §8 of `plans/autonomous-profit-project-research-2026-10-19.md` still shows the 2026-10-19 acceptance and 2027-01-17 expiry, with no "Revoked" status line and no uncommitted change to the file. Inside 06:00–21:00. 0 prior T1 this week and this month. Row added to `docs/publication-log.md`.
 
-### 2026-11-08T00:10:00Z - Published, deployed and logged (verified evidence)
+### 2026-11-07T23:59:00Z - Published, deployed and logged (verified evidence)
 Commit `9cc90ba` pushed to `main` at 2026-11-07 17:58 America/Regina. CI run [42427616487](https://github.com/Tempuskg/cite-ledger/actions/runs/42427616487) and Product page run [42427616442](https://github.com/Tempuskg/cite-ledger/actions/runs/42427616442) both succeeded. https://tempuskg.github.io/cite-ledger/articles/how-to-check-bibtex-references-for-unresolved-dois.html returns HTTP 200.
 
-### 2026-11-08T00:12:00Z - Weekly log for Darren (week of 2026-11-01 to 2026-11-07)
+### 2026-11-07T23:59:30Z - Weekly log for Darren (week of 2026-11-01 to 2026-11-07)
 **Standing instruction.** In force, accepted 2026-10-19, expires 2027-01-17, not revoked. Checked at 17:09 and again at 17:58 America/Regina, right before publishing (verified evidence).
 
 **Crossref live.** Workflow active. Scheduled run [41461586815](https://github.com/Tempuskg/cite-ledger/actions/runs/41461586815) on 2026-11-02 succeeded. No re-enable needed.
@@ -95,7 +95,7 @@ Commit `9cc90ba` pushed to `main` at 2026-11-07 17:58 America/Regina. CI run [42
 
 **Next week.** `card-mw72euz3-2`, "Weekly operations run - Nov 8", is in Backlog. It has the same description and criteria, no `dependsOn`, and the same assignee as this card (human).
 
-### 2026-11-08T00:14:00Z - Closing summary
+### 2026-11-07T23:59:45Z - Closing summary
 All four acceptance criteria are met, each by the verified evidence above.
 - **Instruction confirmed before publishing:** yes, checked at 17:58 America/Regina before the 17:58 push.
 - **Every item published is in the log, within the limits:** yes, 1 T1 article.
@@ -105,6 +105,10 @@ All four acceptance criteria are met, each by the verified evidence above.
 The previous-log acknowledgement, the topic choice and the go-ahead to publish are user-reported. No unresolved exceptions. This card's column and assignee were not changed; moving it is left to the board's column rules.
 STATUS: DONE
 
-### 2026-11-08T00:20:00Z - Go-ahead to push the board record
+### 2026-11-08T00:00:15Z - Go-ahead to push the board record
 Q: "Should I push `0a90941` to `main`?"
 A: "Yes". Reported by Darren McLeod in interview chat, 2026-11-07. User-reported. Pushed with this entry.
+
+### 2026-11-08T00:02:30Z - Weekly log acknowledged by Darren
+Q: Acknowledge this week's weekly log (entry 2026-11-07T23:59:30Z above)?
+A: "Acknowledge it". Reported by Darren McLeod in interview chat, 2026-11-07 (18:02 America/Regina). User-reported. This resets the 14-day window in stop condition 5. The card's status is unchanged.
