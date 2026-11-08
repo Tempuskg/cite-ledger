@@ -64,10 +64,10 @@ Q: "May I publish the T1 article "How to check BibTeX references for corrections
 A: "Yes, publish". Reported by Darren McLeod in interview chat, 2026-11-08. User-reported.
 Pre-publish check (verified evidence), 2026-11-08 14:31 America/Regina (20:31:46Z): §8 of `plans/autonomous-profit-project-research-2026-10-19.md` still shows the 2026-10-19 acceptance and 2027-01-17 expiry, with no "Revoked" status line and no uncommitted change to the file. Inside 06:00–21:00. 0 prior T1 this week, 1 this month. Local `main` in sync with `origin/main`. Row added to `docs/publication-log.md`.
 
-### 2026-11-08T20:38:00Z - Published, deployed and logged (verified evidence)
+### 2026-11-08T20:37:45Z - Published, deployed and logged (verified evidence)
 Commit `8f685a6` (the article, `site/index.html` and `docs/publication-log.md` only) pushed to `main` at 2026-11-08 14:32 America/Regina. CI run [42520616439](https://github.com/Tempuskg/cite-ledger/actions/runs/42520616439) and Product page run [42520616318](https://github.com/Tempuskg/cite-ledger/actions/runs/42520616318) both succeeded. https://tempuskg.github.io/cite-ledger/articles/how-to-check-bibtex-references-for-corrections-and-expressions-of-concern.html returns HTTP 200.
 
-### 2026-11-08T20:40:00Z - Weekly log for Darren (week of 2026-11-08 to 2026-11-14)
+### 2026-11-08T20:38:00Z - Weekly log for Darren (week of 2026-11-08 to 2026-11-14)
 **Standing instruction.** In force, accepted 2026-10-19, expires 2027-01-17, not revoked. Checked at 14:23 and again at 14:31 America/Regina, right before publishing (verified evidence).
 
 **Crossref live.** Workflow active. Scheduled run [41461586815](https://github.com/Tempuskg/cite-ledger/actions/runs/41461586815) on 2026-11-02 succeeded; the next is due Monday 2026-11-09. No re-enable needed.
@@ -97,7 +97,7 @@ Commit `8f685a6` (the article, `site/index.html` and `docs/publication-log.md` o
 
 **Next week.** `card-mw8anibc-1`, "Weekly operations run - Nov 15", is in Backlog. It has the same description and criteria, no `dependsOn`, and the same assignee as this card (human).
 
-### 2026-11-08T20:42:00Z - Closing summary
+### 2026-11-08T20:38:30Z - Closing summary
 All four acceptance criteria are met, each by the verified evidence above.
 - **Instruction confirmed before publishing:** yes, checked at 14:31 America/Regina, before the 14:32 push of `8f685a6`.
 - **Every item published is in the log, within the limits:** yes, 1 T1 article (1/week, 2/4 in November); its row is in `docs/publication-log.md`.
@@ -107,6 +107,15 @@ All four acceptance criteria are met, each by the verified evidence above.
 The topic choice and the go-ahead to publish are user-reported. No unresolved exceptions. This card's column and assignee were not changed; moving it is left to the board's column rules.
 STATUS: DONE
 
-### 2026-11-08T20:44:00Z - Go-ahead to push the board record
+### 2026-11-08T20:39:50Z - Go-ahead to push the board record
 Q: "Should I push the board record commit `07cc1aa` to `main`?"
+A: "Yes, push". Reported by Darren McLeod in interview chat, 2026-11-08. User-reported. Pushed with this entry. The card's status is unchanged.
+
+### 2026-11-08T20:42:56Z - Weekly log acknowledged by Darren
+Q: Acknowledge this week's weekly log (entry 2026-11-08T20:38:00Z above) by 2026-11-22?
+A: "ackhowleded" [sic]. Reported by Darren McLeod in interview chat, 2026-11-08. User-reported. This resets the 14-day window in stop condition 5. The card's status is unchanged.
+Correction note: the Activity headings from 20:37Z to 20:42Z (publish record, weekly log, closing summary, push go-ahead, this entry) were first written with estimated times ahead of the real clock. They were corrected on 2026-11-08 to match the commit times of `07cc1aa` (20:38:35Z), `e44aee7` (20:39:53Z) and this commit.
+
+### 2026-11-08T20:43:26Z - Go-ahead to push the acknowledgement
+Q: "Should I push `900b3ee` (your acknowledgement and the corrected Activity times) to `main`?"
 A: "Yes, push". Reported by Darren McLeod in interview chat, 2026-11-08. User-reported. Pushed with this entry. The card's status is unchanged.
