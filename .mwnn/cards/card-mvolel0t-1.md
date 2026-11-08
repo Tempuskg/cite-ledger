@@ -104,3 +104,7 @@ All four acceptance criteria are met, each by the verified evidence above.
 
 The previous-log acknowledgement, the topic choice and the go-ahead to publish are user-reported. No unresolved exceptions. This card's column and assignee were not changed; moving it is left to the board's column rules.
 STATUS: DONE
+
+### 2026-11-08T00:20:00Z - Go-ahead to push the board record
+Q: "Should I push `0a90941` to `main`?"
+A: "Yes". Reported by Darren McLeod in interview chat, 2026-11-07. User-reported. Pushed with this entry.
