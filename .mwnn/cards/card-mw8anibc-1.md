@@ -4,8 +4,9 @@ title: Weekly operations run - Nov 15
 column: col-mvfa2glc-1
 position: 1000
 assignee: { kind: human }
+scheduledFor: "2026-11-15T09:00"
 createdAt: 1794170267256
-updatedAt: 1794170267256
+updatedAt: 1794170861440
 ---
 
 ## Description
@@ -30,3 +31,5 @@ At the end of the run, create next week's operations card in this board's Backlo
 - [ ] Next week's operations card exists.
 
 ## Activity
+### 2026-11-08T20:47:46Z - Scheduled
+`scheduledFor` set to "2026-11-15T09:00" (local wall time), as chosen by Darren McLeod in the interview chat on `card-mw72euz3-2`, 2026-11-08. User-reported.
