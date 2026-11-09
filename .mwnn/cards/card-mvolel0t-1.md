@@ -1,11 +1,11 @@
 ---
 id: card-mvolel0t-1
 title: Weekly operations run - Nov 1
-column: col-mvfa2glc-3
-position: 1000
+column: col-mvfa2glc-5
+position: -17000
 assignee: { kind: human }
 createdAt: 1792979003117
-updatedAt: 1794092928847
+updatedAt: 1794103127249
 ---
 
 ## Description

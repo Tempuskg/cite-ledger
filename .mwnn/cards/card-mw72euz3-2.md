@@ -1,11 +1,11 @@
 ---
 id: card-mw72euz3-2
 title: Weekly operations run - Nov 8
-column: col-mvfa2glc-3
-position: 1000
+column: col-mvfa2glc-5
+position: -24000
 assignee: { kind: human }
 createdAt: 1794095960655
-updatedAt: 1794169401618
+updatedAt: 1794170885494
 ---
 
 ## Description

@@ -1,6 +1,7 @@
 import {
   agencyEvidenceUrl,
   CrossrefError,
+  firstAuthorIsOrganisation,
   firstAuthorOfWork,
   searchEvidenceUrl,
   titleOfWork,
@@ -20,6 +21,13 @@ import type { ClaimId, ClosestMatch, EntryResult, Evidence, FileKind, FileReport
 const TITLE_DIFFERS_BELOW = 0.8;
 /** Title similarity a search candidate needs before it counts as the same work. */
 const CONFIDENT_MATCH = 0.9;
+/**
+ * Online and print (issue) years often differ by one year, and Crossref may hold only one of them.
+ * A one-year gap is treated as agreement for matching and is not reported as year-differs.
+ */
+function yearAgrees(cited: number, crossrefYears: readonly number[]): boolean {
+  return crossrefYears.length === 0 || crossrefYears.some((year) => Math.abs(year - cited) <= 1);
+}
 
 export interface CheckOptions {
   readonly crossref: CrossrefClient;
@@ -74,6 +82,32 @@ function sourceLabel(source: string): string {
   return source === 'retraction-watch' ? 'Retraction Watch' : source === 'publisher' ? 'the publisher' : source;
 }
 
+/**
+ * Hide authors for retractions and expressions of concern (AGENTS.md hard rule 4),
+ * and corrections (Darren's 2026-11-08 decision on card-mw72euz3-1).
+ * Applying the same privacy policy does not imply that a correction questions validity.
+ */
+function shouldHideAuthorNames(work: CrossrefWork): boolean {
+  return (work['updated-by'] ?? []).some((update) => {
+    const kind = classifyUpdate(update.type).kind;
+    return kind === 'retraction' || kind === 'expression-of-concern' || kind === 'correction';
+  });
+}
+
+/** How a Crossref-update finding could be wrong, worded for that notice type (AGENTS.md hard rule 4). */
+function updateCouldBeWrong(kind: FindingKind): string {
+  switch (kind) {
+    case 'retraction':
+      return 'The notice is what Crossref records; open it to see what was withdrawn. Crossref may link the wrong notice, or a later notice may restore the work.';
+    case 'expression-of-concern':
+      return 'The notice is what Crossref records; open it to see what is questioned. An expression of concern is not a retraction, and Crossref may also link the wrong notice.';
+    case 'correction':
+      return 'The notice is what Crossref records; read it to see what it changes. A correction may leave the findings intact.';
+    default:
+      return 'The notice is what Crossref records; open it to see what it says. Crossref may also link the wrong notice.';
+  }
+}
+
 /** One finding per notice; a notice reported by both the publisher and Retraction Watch is merged. */
 function updateFindings(entry: ReferenceEntry, work: CrossrefWork): Finding[] {
   const groups = new Map<string, { update: CrossrefUpdate; sources: string[] }>();
@@ -100,7 +134,7 @@ function updateFindings(entry: ReferenceEntry, work: CrossrefWork): Finding[] {
         { url: doiUrl(update.DOI), label: `${label} notice ${update.DOI}` },
         { url: workEvidenceUrl(work.DOI), label: `Crossref record ${work.DOI}` },
       ],
-      'The notice is what Crossref records; read it to see what it changes. A correction may leave the findings intact.',
+      updateCouldBeWrong(cls.kind),
     );
   });
 }
@@ -120,18 +154,29 @@ function compareStructured(entry: ReferenceEntry, work: CrossrefWork): Finding[]
     }
   }
   const years = yearsOfWork(work);
-  if (entry.year !== undefined && years.length > 0 && !years.includes(entry.year)) {
+  if (entry.year !== undefined && years.length > 0 && !yearAgrees(entry.year, years)) {
     findings.push(finding(entry, 'year-differs', 'P3', 'warning',
       `Year differs from the Crossref record for ${work.DOI}. File: ${entry.year}. Crossref: ${years.join(' or ')}.`,
-      evidence, 'Print, online and conference years can differ; Crossref may hold only some of them.',
+      evidence, 'Print, online and conference years can differ; Crossref may hold only some of them. A one-year gap is treated as online versus print and is not reported.',
       { fileValue: String(entry.year), crossrefValue: years.join(' or ') }));
   }
   const crossrefAuthor = firstAuthorOfWork(work);
-  if (entry.firstAuthorFamily && crossrefAuthor && !sameFamilyName(entry.firstAuthorFamily, crossrefAuthor)) {
-    findings.push(finding(entry, 'first-author-differs', 'P3', 'warning',
-      `First author differs from the Crossref record for ${work.DOI}. File: ${entry.firstAuthorFamily}. Crossref: ${crossrefAuthor}.`,
-      evidence, 'Name order, transliteration or a group author can make the same person look different.',
-      { fileValue: entry.firstAuthorFamily, crossrefValue: crossrefAuthor }));
+  if (
+    !firstAuthorIsOrganisation(work)
+    && entry.firstAuthorFamily
+    && crossrefAuthor
+    && !sameFamilyName(entry.firstAuthorFamily, crossrefAuthor)
+  ) {
+    if (shouldHideAuthorNames(work)) {
+      findings.push(finding(entry, 'first-author-differs', 'P3', 'warning',
+        `First author differs from the Crossref record for ${work.DOI}; open the evidence link to compare.`,
+        evidence, 'Name order or transliteration can make the same person look different.'));
+    } else {
+      findings.push(finding(entry, 'first-author-differs', 'P3', 'warning',
+        `First author differs from the Crossref record for ${work.DOI}. File: ${entry.firstAuthorFamily}. Crossref: ${crossrefAuthor}.`,
+        evidence, 'Name order or transliteration can make the same person look different.',
+        { fileValue: entry.firstAuthorFamily, crossrefValue: crossrefAuthor }));
+    }
   }
   return findings;
 }
@@ -149,18 +194,29 @@ function compareFreeText(entry: ReferenceEntry, work: CrossrefWork): Finding[] {
   }
   const textYears = yearsIn(text);
   const years = yearsOfWork(work);
-  if (textYears.length === 1 && years.length > 0 && !years.includes(textYears[0])) {
+  if (textYears.length === 1 && years.length > 0 && !yearAgrees(textYears[0], years)) {
     findings.push(finding(entry, 'year-differs', 'P3', 'warning',
       `Year differs from the Crossref record for ${work.DOI}. File: ${textYears[0]}. Crossref: ${years.join(' or ')}.`,
-      evidence, 'Print, online and conference years can differ; Crossref may hold only some of them.',
+      evidence, 'Print, online and conference years can differ; Crossref may hold only some of them. A one-year gap is treated as online versus print and is not reported.',
       { fileValue: String(textYears[0]), crossrefValue: years.join(' or ') }));
   }
   const crossrefAuthor = firstAuthorOfWork(work);
-  if (crossrefAuthor && tokens(text).length >= 6 && !normalizeText(text).split(' ').some((word) => sameFamilyName(word, crossrefAuthor))) {
-    findings.push(finding(entry, 'first-author-differs', 'P3', 'warning',
-      `The reference text does not name the first author in the Crossref record for ${work.DOI}: ${crossrefAuthor}.`,
-      evidence, 'Transliteration, initials-only citations or a group author can hide a match.',
-      { fileValue: entry.rawText, crossrefValue: crossrefAuthor }));
+  if (
+    !firstAuthorIsOrganisation(work)
+    && crossrefAuthor
+    && tokens(text).length >= 6
+    && !normalizeText(text).split(' ').some((word) => sameFamilyName(word, crossrefAuthor))
+  ) {
+    if (shouldHideAuthorNames(work)) {
+      findings.push(finding(entry, 'first-author-differs', 'P3', 'warning',
+        `First author differs from the Crossref record for ${work.DOI}; open the evidence link to compare.`,
+        evidence, 'Transliteration or initials-only citations can hide a match.'));
+    } else {
+      findings.push(finding(entry, 'first-author-differs', 'P3', 'warning',
+        `The reference text does not name the first author in the Crossref record for ${work.DOI}: ${crossrefAuthor}.`,
+        evidence, 'Transliteration or initials-only citations can hide a match.',
+        { fileValue: entry.rawText, crossrefValue: crossrefAuthor }));
+    }
   }
   return findings;
 }
@@ -172,21 +228,22 @@ function isConfidentMatch(entry: ReferenceEntry, work: CrossrefWork): boolean {
   }
   const years = yearsOfWork(work);
   const author = firstAuthorOfWork(work);
+  const orgAuthor = firstAuthorIsOrganisation(work);
   if (entry.structured) {
     const fullTitle = [title, ...(work.subtitle ?? [])].join(' ');
     const similarity = entry.title ? Math.max(titleSimilarity(entry.title, title), titleSimilarity(entry.title, fullTitle)) : 0;
-    const yearOk = entry.year === undefined || years.length === 0 || years.includes(entry.year);
-    const authorOk = !entry.firstAuthorFamily || !author || sameFamilyName(entry.firstAuthorFamily, author);
+    const yearOk = entry.year === undefined || yearAgrees(entry.year, years);
+    const authorOk = orgAuthor || !entry.firstAuthorFamily || !author || sameFamilyName(entry.firstAuthorFamily, author);
     return similarity >= CONFIDENT_MATCH && yearOk && authorOk;
   }
   const text = entry.rawText;
   const textYears = yearsIn(text);
-  const yearNamed = years.some((year) => textYears.includes(year));
+  const yearNamed = textYears.some((cited) => yearAgrees(cited, years));
   const authorNamed = author !== undefined && normalizeText(text).split(' ').some((word) => sameFamilyName(word, author));
   const yearOk = textYears.length === 0 || years.length === 0 || yearNamed;
-  const authorOk = !author || authorNamed;
+  const authorOk = orgAuthor || !author || authorNamed;
   // A short title such as "Deep learning" appears in many records, so it also needs the author and year.
-  const titleOk = tokens(title).length >= 3 || (authorNamed && yearNamed);
+  const titleOk = tokens(title).length >= 3 || ((authorNamed || orgAuthor) && yearNamed);
   return titleOk && coverage(title, text) >= CONFIDENT_MATCH && yearOk && authorOk;
 }
 
@@ -205,7 +262,7 @@ function closestMatch(entry: ReferenceEntry, candidates: readonly CrossrefWork[]
         doi: work.DOI.toLowerCase(),
         title,
         ...(years[0] !== undefined ? { year: years[0] } : {}),
-        ...(author ? { firstAuthor: author } : {}),
+        ...(author && !shouldHideAuthorNames(work) ? { firstAuthor: author } : {}),
         similarity: Math.round(similarity * 100) / 100,
         url: doiUrl(work.DOI),
       };
@@ -300,11 +357,16 @@ async function checkEntry(entry: ReferenceEntry, options: CheckOptions): Promise
     };
   } catch (error) {
     const url = error instanceof CrossrefError ? error.url : entry.doi ? workEvidenceUrl(entry.doi) : searchEvidenceUrl(entry.queryText);
+    const detail = (error as Error).message;
+    const rateLimited = /\b429\b/.test(detail);
+    const mailtoHint = rateLimited
+      ? ' Set citeLedger.mailto (or --mailto / CITE_LEDGER_MAILTO) to use Crossref\'s polite pool, which allows higher limits.'
+      : '';
     return {
       entry,
       status: 'error',
       findings: [finding(entry, 'lookup-failed', undefined, 'info',
-        `Not checked: ${(error as Error).message}. Nothing is concluded about this reference.`,
+        `Not checked: ${detail}. Nothing is concluded about this reference.${mailtoHint}`,
         [{ url, label: 'The Crossref request that failed' }],
         'This is a network or service problem, not a finding about the reference. Check again later.')],
     };

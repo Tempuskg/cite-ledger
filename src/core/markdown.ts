@@ -1,10 +1,14 @@
-import { arxivIdIn, extractDois, stripUrls } from './normalize';
+import { arxivIdIn, extractDois, stripUrls, yearsIn } from './normalize';
 import type { ParseResult, ReferenceEntry } from './types';
 
 const REFERENCE_HEADING = /^(#{1,6})\s*(?:references|bibliography|works cited|sources|citations|literature cited|reference list)\b/i;
 const ITEM_START = /^\s{0,3}(?:[-*+]|\d+[.)]|\[\d+\]|\[\^[^\]]+\]:)\s+/;
 const TABLE_ROW = /^\s{0,3}\|/;
 const TABLE_SEPARATOR = /^\s{0,3}\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)*\|?\s*$/;
+/** CommonMark link reference definition whose destination is an http(s) URL — not a citation. */
+const LINK_REFERENCE_DEFINITION = /^\s{0,3}\[[^\]\n]+\]:\s*<?https?:\/\//i;
+/** Pipeline / howto steps that sometimes sit under a heading that starts with "References". */
+const IMPERATIVE_STEP = /^(?:create|build|download|run|align|merge|optional|post-processing|install|clone|configure|deploy|generate|prepare|fetch|load|save|enable|disable|start|stop|set up|copy|check out|write|add|remove|update)\b/i;
 
 function plain(markdown: string): string {
   return markdown
@@ -21,6 +25,50 @@ interface Block {
   readonly text: string;
 }
 
+function isLinkReferenceDefinition(line: string): boolean {
+  return LINK_REFERENCE_DEFINITION.test(line);
+}
+
+/** Skip reasons for Markdown items that are not bibliographic references. */
+function markdownSkipReason(raw: string, query: string, doi: string | undefined): string | undefined {
+  if (doi) {
+    return undefined;
+  }
+  if (query.split(/\s+/).filter(Boolean).length < 3) {
+    return 'No DOI and too little text to look up.';
+  }
+  if (IMPERATIVE_STEP.test(query) && yearsIn(query).length === 0) {
+    return 'Step or instruction, not a bibliographic reference.';
+  }
+  if (isLinkOnly(raw, query)) {
+    return 'Link with no bibliographic text.';
+  }
+  return undefined;
+}
+
+/** A URL (or Markdown link) plus a short non-bibliographic label — not a work to look up. */
+function isLinkOnly(raw: string, query: string): boolean {
+  if (yearsIn(query).length > 0) {
+    return false;
+  }
+  if (/\bet\s+al\.?\b/i.test(query)) {
+    return false;
+  }
+  // "Surname, I." author pattern common in reference lists.
+  if (/\b[A-Z][A-Za-z'’-]+,\s+[A-Z]/u.test(query)) {
+    return false;
+  }
+  // "Name. Title words..." shape.
+  if (/[A-Za-z]\.\s+[A-Z]/.test(query) && query.split(/\s+/).filter(Boolean).length >= 4) {
+    return false;
+  }
+  const hadUrl = /https?:\/\//i.test(raw) || /\bdoi:\s*10\./i.test(raw);
+  if (!hadUrl) {
+    return false;
+  }
+  return query.split(/\s+/).filter(Boolean).length <= 6;
+}
+
 function referenceBlocks(lines: readonly string[], from: number, to: number): Block[] {
   const blocks: Block[] = [];
   const hasItems = lines.slice(from, to).some((line) => ITEM_START.test(line));
@@ -33,6 +81,10 @@ function referenceBlocks(lines: readonly string[], from: number, to: number): Bl
   };
   for (let i = from; i < to; i++) {
     const line = lines[i];
+    // Link reference definitions are Markdown syntax, not citations; never merge them into the item above.
+    if (isLinkReferenceDefinition(line)) {
+      continue;
+    }
     if (TABLE_ROW.test(line)) {
       // Each table row is one reference; the header row (followed by a separator) and the separator are not.
       flush();
@@ -95,6 +147,12 @@ export function parseMarkdown(text: string): ParseResult {
     while (end < lines.length && !(inCode[end] === false && new RegExp(`^#{1,${level}}\\s`).test(lines[end]))) {
       end++;
     }
+    // Mark link reference definitions in this section so the prose DOI scan does not treat them as citations.
+    for (let line = i + 1; line < end; line++) {
+      if (!inCode[line] && isLinkReferenceDefinition(lines[line])) {
+        covered.add(line);
+      }
+    }
     for (const block of referenceBlocks(lines, i + 1, end)) {
       if (inCode[block.start]) {
         continue;
@@ -103,6 +161,7 @@ export function parseMarkdown(text: string): ParseResult {
       const [doi, ...others] = extractDois(block.text);
       const arxivId = arxivIdIn(raw);
       const query = stripUrls(raw).replace(/\s+/g, ' ').trim();
+      const skipReason = markdownSkipReason(raw, query, doi);
       entries.push({
         id: `line ${block.start + 1}`,
         kind: 'markdown',
@@ -114,7 +173,7 @@ export function parseMarkdown(text: string): ParseResult {
         structured: false,
         inReferenceList: true,
         ...(arxivId ? { arxivId } : {}),
-        ...(!doi && query.split(' ').length < 3 ? { skipReason: 'No DOI and too little text to look up.' } : {}),
+        ...(skipReason ? { skipReason } : {}),
       });
       for (let line = block.start; line <= block.end; line++) {
         covered.add(line);
@@ -144,7 +203,7 @@ export function parseMarkdown(text: string): ParseResult {
 
   const seen = new Set(entries.map((entry) => entry.doi).filter((doi): doi is string => doi !== undefined));
   lines.forEach((line, index) => {
-    if (inCode[index] || covered.has(index)) {
+    if (inCode[index] || covered.has(index) || isLinkReferenceDefinition(line)) {
       return;
     }
     for (const doi of extractDois(line)) {

@@ -18,7 +18,7 @@ const BIB = `@article{retracted, author = {Wakefield, A. J.}, year = {1998}, doi
 @article{concern, author = {Feng, Xiaomin}, year = {2013}, doi = {10.1371/journal.pone.0061107},
   title = {Impairment of FOS mRNA Stabilization Following Translation Arrest in Granulocytes from Myelodysplastic Syndrome Patients}}
 @article{unregistered, author = {Example, Ann}, title = {Unregistered}, year = {2024}, doi = {10.5555/cite-ledger-unregistered-0000}}
-@article{mismatch, author = {Hinton, Geoffrey}, title = {Neural networks for everything}, year = {2016}, doi = {10.1038/nature14539}}
+@article{mismatch, author = {Hinton, Geoffrey}, title = {Neural networks for everything}, year = {2010}, doi = {10.1038/nature14539}}
 @article{matched, author = {LeCun, Yann}, title = {Deep learning}, journal = {Nature}, year = {2015}}
 @misc{arxiv, author = {Kingma, Diederik P.}, title = {Adam: A Method for Stochastic Optimization}, year = {2014}, doi = {10.48550/arXiv.1412.6980}}
 @software{zenodo, author = {Example, Ann}, title = {A software release archived on Zenodo}, year = {2017}, doi = {10.5281/zenodo.591564}}

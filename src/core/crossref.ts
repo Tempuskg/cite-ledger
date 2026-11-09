@@ -88,14 +88,33 @@ export function searchEvidenceUrl(bibliographic: string, rows = 3): string {
   return `${CROSSREF_BASE}/works?query.bibliographic=${encodeURIComponent(bibliographic)}&rows=${rows}`;
 }
 
+/**
+ * Crossref pool defaults and 429 retry policy.
+ *
+ * Sources:
+ * - https://www.crossref.org/documentation/retrieve-metadata/rest-api/access-and-authentication/
+ * - https://www.crossref.org/blog/announcing-changes-to-rest-api-rate-limits/
+ *
+ * Public pool (no mailto): concurrency 1; single-record 5/s; list queries 1/s.
+ * Polite pool (mailto set): concurrency 3; single-record 10/s; list queries 3/s.
+ *
+ * On HTTP 429 or 5xx, retry up to `retries` times (default 3). Prefer the
+ * Retry-After header (seconds) when present; otherwise exponential backoff
+ * 1s, 2s, 4s, …. Crossref asks clients that hit 429 to pause and continue at a
+ * lower rate.
+ */
 export function createCrossrefClient(options: CrossrefClientOptions = {}): CrossrefClient {
   const fetcher: Fetch = options.fetch ?? ((input, init) => globalThis.fetch(input, init));
-  const concurrency = Math.max(1, options.concurrency ?? 3);
-  const minIntervalMs = options.minIntervalMs ?? 200;
+  const mailto = options.mailto?.trim();
+  const polite = Boolean(mailto);
+  const concurrency = Math.max(1, options.concurrency ?? (polite ? 3 : 1));
+  // When minIntervalMs is set (including 0 in tests), both request kinds use it.
+  // Otherwise spacing follows the published per-kind rates above.
+  const singleIntervalMs = options.minIntervalMs ?? (polite ? 100 : 200);
+  const listIntervalMs = options.minIntervalMs ?? (polite ? 334 : 1000);
   const retries = options.retries ?? 3;
   const timeoutMs = options.timeoutMs ?? 20_000;
   const sleep = options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
-  const mailto = options.mailto?.trim();
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (options.userAgent) {
     headers['User-Agent'] = options.userAgent;
@@ -107,12 +126,21 @@ export function createCrossrefClient(options: CrossrefClientOptions = {}): Cross
   const workCache = new Map<string, Promise<WorkLookup>>();
   const agencyCache = new Map<string, Promise<AgencyLookup>>();
 
-  async function acquire(): Promise<void> {
+  /** `/works?...` is a list query; `/works/{doi}` and `/agency` are single-record. */
+  function intervalFor(url: string): number {
+    try {
+      return new URL(url).pathname === '/works' ? listIntervalMs : singleIntervalMs;
+    } catch {
+      return singleIntervalMs;
+    }
+  }
+
+  async function acquire(intervalMs: number): Promise<void> {
     if (active >= concurrency) {
       await new Promise<void>((resolve) => waiting.push(resolve));
     }
     active++;
-    const gap = lastStart + minIntervalMs - Date.now();
+    const gap = lastStart + intervalMs - Date.now();
     lastStart = Date.now() + Math.max(0, gap);
     if (gap > 0) {
       await sleep(gap);
@@ -130,7 +158,7 @@ export function createCrossrefClient(options: CrossrefClientOptions = {}): Cross
 
   async function request(url: string): Promise<Response> {
     for (let attempt = 0; ; attempt++) {
-      await acquire();
+      await acquire(intervalFor(url));
       let response: Response;
       try {
         response = await fetcher(withMailto(url), { headers, signal: AbortSignal.timeout(timeoutMs) });
@@ -226,9 +254,19 @@ export function yearsOfWork(work: CrossrefWork): number[] {
   return years;
 }
 
+function firstAuthorRecord(work: CrossrefWork): CrossrefAuthor | undefined {
+  return work.author?.find((candidate) => candidate.sequence === 'first') ?? work.author?.[0];
+}
+
 export function firstAuthorOfWork(work: CrossrefWork): string | undefined {
-  const author = work.author?.find((candidate) => candidate.sequence === 'first') ?? work.author?.[0];
+  const author = firstAuthorRecord(work);
   return author?.family ?? author?.name;
+}
+
+/** Crossref puts a group or organisation in `name` without `family`; a person uses `family`. */
+export function firstAuthorIsOrganisation(work: CrossrefWork): boolean {
+  const author = firstAuthorRecord(work);
+  return Boolean(author?.name && !author.family);
 }
 
 export function titleOfWork(work: CrossrefWork): string {

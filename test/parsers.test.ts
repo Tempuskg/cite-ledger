@@ -5,7 +5,7 @@ import { describe, test } from 'node:test';
 import { parseBibtex } from '../src/core/bibtex';
 import { parseLatex } from '../src/core/latex';
 import { parseMarkdown } from '../src/core/markdown';
-import { arxivIdIn, extractDois, firstAuthorFamily, normalizeDoi, stripUpdatePrefix, titleSimilarity } from '../src/core/normalize';
+import { arxivIdIn, extractDois, firstAuthorFamily, latexToPlain, normalizeDoi, stripUpdatePrefix, stripUrls, titleSimilarity } from '../src/core/normalize';
 import { kindForFile } from '../src/core/parse';
 import { FIXTURES, fixtureFile } from './helpers';
 
@@ -42,13 +42,34 @@ describe('BibTeX parser', () => {
 describe('LaTeX parser', () => {
   test('reads thebibliography items, \\doi and ignores comments', () => {
     const { entries, notes, bibFiles } = parseLatex(fixtureFile('claims.tex'));
-    assert.deepEqual(entries.map((entry) => entry.id), ['wakefield', 'lecun', 'fake']);
+    assert.deepEqual(entries.map((entry) => entry.id), ['wakefield', 'lecun', 'lecunBibinfo', 'fake']);
     assert.equal(entries[0].doi, '10.1016/s0140-6736(97)11096-0');
     assert.equal(entries[1].doi, undefined);
     assert.equal(entries[0].startLine, 4);
     assert.match(entries[1].rawText, /Deep learning/);
     assert.deepEqual(notes, []);
     assert.deepEqual(bibFiles, ['extra.bib']);
+  });
+
+  test('keeps only bibinfo values, not field names, in query and comparison text', () => {
+    const sample = String.raw`\bibinfo{author}{LeCun, Y.} \& \bibinfo{author}{Bengio, Y.}
+\newblock \bibinfo{title}{Deep {L}earning}.
+\newblock \emph{\bibinfo{journal}{Nature}} (\bibinfo{year}{2015}).`;
+    const plain = latexToPlain(sample).replace(/\s+/g, ' ').trim();
+    assert.match(plain, /LeCun, Y/);
+    assert.match(plain, /Deep Learning/);
+    assert.match(plain, /Nature/);
+    assert.match(plain, /2015/);
+    assert.doesNotMatch(plain, /author/);
+    assert.doesNotMatch(plain, /title/);
+    assert.doesNotMatch(plain, /journal/);
+    assert.doesNotMatch(plain, /year/);
+
+    const { entries } = parseLatex(`\\begin{thebibliography}{9}\n\\bibitem{x}\n${sample}\n\\end{thebibliography}`);
+    assert.equal(entries.length, 1);
+    assert.equal(entries[0].queryText, plain);
+    assert.equal(entries[0].rawText, plain);
+    assert.doesNotMatch(entries[0].queryText, /author|title|journal|year/);
   });
 });
 
@@ -95,6 +116,25 @@ describe('Markdown parser', () => {
       ['line 5', '10.5555/a-0003'],
     ]);
   });
+
+  test('ignores link reference definitions, keeps HTML anchor text, and skips link-only and imperative items', () => {
+    const { entries } = parseMarkdown(readFileSync(path.join(FIXTURES, 'parsers', 'non-reference.md'), 'utf8'));
+    assert.deepEqual(entries.map((entry) => [entry.id, entry.doi ?? null, entry.skipReason ?? null]), [
+      ['line 5', '10.1038/nature14539', null],
+      ['line 9', '10.1371/journal.pcbi.1004333', null],
+      ['line 10', null, 'Link with no bibliographic text.'],
+      ['line 11', null, 'Step or instruction, not a bibliographic reference.'],
+      ['line 12', null, 'Step or instruction, not a bibliographic reference.'],
+      ['line 13', null, 'Step or instruction, not a bibliographic reference.'],
+    ]);
+    // Link reference definitions are not entries and are not merged into the LeCun item above them.
+    assert.equal(entries[0].endLine, 4);
+    assert.doesNotMatch(entries[0].rawText, /\[di\]:|\[tcga\]:/);
+    assert.ok(!entries.some((entry) => entry.doi === '10.1038/s41598-019-47765-6'));
+    // stripUrls left the named first author inside the <a href="...">...</a> anchor.
+    assert.match(entries[1].queryText, /Vallejos/);
+    assert.match(entries[1].rawText, /Vallejos/);
+  });
 });
 
 describe('normalization', () => {
@@ -125,6 +165,45 @@ describe('normalization', () => {
     ]);
     assert.equal(normalizeDoi('https://dx.doi.org/10.1000%2FABC'), '10.1000/abc');
     assert.equal(normalizeDoi('not a doi'), undefined);
+  });
+
+  test('strips Markdown link, emphasis, badge, quote, PDF and bioRxiv path suffixes from DOIs', () => {
+    // Forms seen in the findings baseline (card-mvq266pd-3): trailing syntax stuck to a valid DOI.
+    assert.deepEqual(extractDois('[10.1109/mc.2009.26](https://doi.org/10.1109/mc.2009.26)'), [
+      '10.1109/mc.2009.26',
+    ]);
+    assert.deepEqual(extractDois('https://doi.org/10.1101/gr.239244.118)_**'), [
+      '10.1101/gr.239244.118',
+    ]);
+    assert.deepEqual(extractDois('10.1093/nar/gky1097*'), ['10.1093/nar/gky1097']);
+    assert.deepEqual(extractDois('[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6386437.svg)](https://doi.org/10.5281/zenodo.6386437)'), [
+      '10.5281/zenodo.6386437',
+    ]);
+    assert.deepEqual(extractDois('[![DOI](http://joss.theoj.org/papers/10.21105/joss.00505/status.svg)](https://doi.org/10.21105/joss.00505)'), [
+      '10.21105/joss.00505',
+    ]);
+    assert.deepEqual(extractDois('10.1016/j.cels.2021.08.010).”'), [
+      '10.1016/j.cels.2021.08.010',
+    ]);
+    assert.deepEqual(extractDois('10.1007/s10522-020-09866-y.pdf'), [
+      '10.1007/s10522-020-09866-y',
+    ]);
+    assert.deepEqual(extractDois('https://www.biorxiv.org/content/10.1101/447250v1'), [
+      '10.1101/447250',
+    ]);
+    assert.deepEqual(extractDois('https://www.biorxiv.org/content/10.64898/2026.04.24.720536v1.article-metrics'), [
+      '10.64898/2026.04.24.720536',
+    ]);
+    // Dotted ".vN" is part of the DOI (figshare); only trailing emphasis is removed.
+    assert.deepEqual(extractDois('https://doi.org/10.25452/figshare.plus.25880521.v1**_'), [
+      '10.25452/figshare.plus.25880521.v1',
+    ]);
+  });
+
+  test('stripUrls stops at the end of a URL inside an HTML attribute', () => {
+    const anchor = '<a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). PLoS Computational Biology.</a>';
+    assert.match(stripUrls(anchor), /Vallejos/);
+    assert.doesNotMatch(stripUrls(anchor), /https?:/);
   });
 
   test('strips update prefixes and compares titles', () => {

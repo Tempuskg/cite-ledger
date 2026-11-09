@@ -42,7 +42,12 @@ describe('claim register P1-P4 (BibTeX fixture)', () => {
     assert.match(retraction.message, /Retraction recorded in Crossref .*10\.1016\/s0140-6736\(10\)60175-4/);
     assert.match(retraction.message, /Retraction Watch/);
     assert.equal(retraction.evidence[0].url, 'https://doi.org/10.1016/s0140-6736(10)60175-4');
+    assert.match(retraction.couldBeWrong, /what was withdrawn/);
+    assert.match(retraction.couldBeWrong, /later notice may restore the work/);
+    assert.doesNotMatch(retraction.couldBeWrong, /correction may leave/);
     assert.equal(correction.claim, 'P2');
+    assert.match(correction.couldBeWrong, /what it changes/);
+    assert.match(correction.couldBeWrong, /A correction may leave the findings intact/);
     assert.equal(findings.length, 2, 'no title, year or author finding: the RETRACTED prefix is not a mismatch');
   });
 
@@ -54,6 +59,9 @@ describe('claim register P1-P4 (BibTeX fixture)', () => {
     assert.equal(findings[0].claim, 'P2');
     assert.match(findings[0].message, /Recorded by Retraction Watch and the publisher/);
     assert.equal(findings[0].evidence[0].url, 'https://doi.org/10.1371/journal.pone.0278805');
+    assert.match(findings[0].couldBeWrong, /what is questioned/);
+    assert.match(findings[0].couldBeWrong, /not a retraction/);
+    assert.doesNotMatch(findings[0].couldBeWrong, /correction may leave/);
   });
 
   test('P3: shows where the title, year and first author differ from the Crossref record (mismatch fixture)', async () => {
@@ -67,8 +75,9 @@ describe('claim register P1-P4 (BibTeX fixture)', () => {
     }
     assert.equal(byKind.get('title-differs')?.crossrefValue, 'Deep learning');
     assert.equal(byKind.get('title-differs')?.fileValue, 'Neural networks for everything');
-    assert.equal(byKind.get('year-differs')?.fileValue, '2016');
+    assert.equal(byKind.get('year-differs')?.fileValue, '2010');
     assert.equal(byKind.get('year-differs')?.crossrefValue, '2015');
+    assert.match(byKind.get('year-differs')?.couldBeWrong ?? '', /online versus print/);
     assert.equal(byKind.get('first-author-differs')?.fileValue, 'Hinton');
     assert.equal(byKind.get('first-author-differs')?.crossrefValue, 'LeCun');
   });
@@ -173,6 +182,8 @@ describe('LaTeX and Markdown fixtures', () => {
     const report = await check('claims.tex', 'latex');
     assert.deepEqual(forEntry(report, 'wakefield').map((finding) => finding.kind).sort(), ['correction', 'retraction']);
     assert.deepEqual(forEntry(report, 'lecun'), []);
+    assert.deepEqual(forEntry(report, 'lecunBibinfo'), [], 'natbib-style \\bibinfo fields match their Crossref record');
+    assert.equal(report.results.find((item) => item.entry.id === 'lecunBibinfo')?.status, 'matched');
     assert.deepEqual(forEntry(report, 'fake').map((finding) => finding.kind), ['unverified']);
     assert.deepEqual(report.notes, ['References for this file are in extra.bib. Open extra.bib and check it there.']);
   });

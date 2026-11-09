@@ -4,9 +4,9 @@ title: Weekly operations run - Nov 15
 column: col-mvfa2glc-1
 position: 1000
 assignee: { kind: human }
-scheduledFor: "2026-11-15T09:00"
 createdAt: 1794170267256
 updatedAt: 1794170861440
+scheduledFor: "2026-11-15T09:00"
 ---
 
 ## Description
