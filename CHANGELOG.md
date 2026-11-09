@@ -1,16 +1,23 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 (2026-11-08)
 
 Each change below is backed by the named tests. The claim register is unchanged.
 
 Checks:
 
 - Checking a `.tex` file now also checks the `.bib` files it names with `\bibliography{...}` (for example `\bibliography{main,refs/extra}`) or `\addbibresource{...}` (for example `\addbibresource{refs/extra.bib}`). Each file is found relative to the `.tex` file, and its findings are reported on that `.bib` file's own lines: in the Problems panel, in CLI output and in reports. Commented-out commands are ignored. A named file that is not found gets a note, not an error, and a remote `\addbibresource` URL is not fetched. This is part of the free single-file check. A Pro workspace scan checks each `.bib` file once, whether it is reached directly or through a `.tex` file. The files are read locally, and lookups still go only to `api.crossref.org`. (P7; `test/linked.test.ts`; `test/parsers.test.ts`; `test/network.test.ts`, P5)
+- A DOI written as Markdown link text, or with trailing emphasis, badge image suffixes, curly quotes, `.pdf`, or a bioRxiv `vN` path suffix, is read without that syntax stuck to it, so a valid DOI is looked up instead of reported as not found. (P1, P7; `test/parsers.test.ts`, "strips Markdown link, emphasis, badge, quote, PDF and bioRxiv path suffixes from DOIs")
+- In a LaTeX `thebibliography` item that uses natbib-style `\bibinfo{field}{value}`, only the values are kept for the Crossref query and for title, year and first-author comparison; the field names are not. (P3, P4, P7; `test/claims.test.ts`, LaTeX fixtures; `test/parsers.test.ts`, "keeps only bibinfo values")
+- Without a `mailto` (Crossref's polite pool), the client stays within Crossref's published public-pool limits: concurrency 1, with longer gaps between requests. With `mailto`, the polite-pool defaults apply. On HTTP 429, the "lookup failed" message mentions setting `mailto`. Lookups still go only to `api.crossref.org`. (P5; `test/crossref.test.ts`; `test/network.test.ts`)
+- In Markdown reference sections, CommonMark link-reference definitions are not treated as entries; HTML anchor text after `href="..."` is kept for author and title checks; and items that are only a short link label, or an imperative pipeline step with no year, are skipped rather than looked up. (P7; `test/parsers.test.ts`, "ignores link reference definitions")
+- A Crossref first author that is a group or organisation (a `name` with no `family`) no longer blocks a confident match or raises first-author-differs on its own. A one-year gap between the cited year and the years Crossref holds is treated as online versus print: the match is allowed and year-differs is not raised; larger gaps are still reported, and the could-be-wrong text still explains print and online years. (P3, P4; `test/match.test.ts`, "organisation authors and online-versus-print years"; `test/claims.test.ts`, P3 mismatch fixture)
+- When Crossref records a retraction, expression of concern or correction for a work, a first-author-differs finding (and a Pro closest-match author field) no longer shows any author name from the file or from Crossref; the finding keeps its evidence link. Findings, docs and marketing never name or characterise the authors of retracted or questioned work. (P2, P3; `test/match.test.ts`, "authors of retracted or questioned works" and "corrections-only author privacy")
+- Retraction, correction and expression-of-concern findings each carry could-be-wrong text that fits that notice type, instead of always using the correction wording. (P2; `test/claims.test.ts`, P2 retraction/correction and expression-of-concern cases)
 
 Docs:
 
-- The README paragraph under "Using it in the editor" no longer says to open the `.bib` file and check it there.
+- The README paragraph under "Using it in the editor" no longer says to open the `.bib` file and check it there; it describes the linked `.bib` check above.
 
 ## 0.1.1 (2026-10-26)
 
